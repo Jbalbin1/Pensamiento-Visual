@@ -10,17 +10,39 @@
 </head>
 <body>
   <header class="topbar">
-    <h1>Delitos, VIF y Satisfacción</h1>
-    <h1>Delitos, VIF y Satisfacción</h1>
+    <h1> 
+      Inicio
+    </h1>
+    <h1>
+      ¿Necesitas ayuda?
+    </h1>
+  </header>
+
+  <div id="satisfaccion">
+    <h2>¿Qué es la satisfacción de la vida?</h2>
+  </div>
+  <div id="definicion"> 
+    <p>
+      La satisfacción de la vida es una medida subjetiva de cómo la
+      persona valora su existencia en el momento, usualmente tomando en
+      consideración factores de salud, seguridad, felicidad, entre otros.
+    </p>
+  </div>
+
+  <div id="DelitosVIFSatisfacción">
+    <h1>Delitos, VIF y Satisfacción:</h1>
     <div class="controls">
-      <label for="yearSel">Año:</label>
+      <label for="yearSel"></label>
       <select id="yearSel"></select>
     </div>
-  </header>
+  </div>
+
 
   <main class="grid">
     <section class="panel">
+    <div id="MapaRegion">
       <h2>Mapa por satisfacción</h2>
+    </div>
       <div class="stage">
         <svg id="mapSvg" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
           <g id="mapGroup"></g>
@@ -29,9 +51,19 @@
     </section>
 
     <section class="panel">
+      <div id="Mapaburbujas">
       <h2>Delitos vs VIF (burbujas)</h2>
+      </div>
       <div class="stage">
         <svg id="bubbleSvg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </section>
+
+    <section class="panel panel-detail">
+      <div id="detailBox" class="detail-box" hidden>
+        <h3>Detalle — Región Metropolitana</h3>
+        <p>Aquí va tu información de la región (texto, cifras, gráficos, etc.).</p>
+        <button id="closeDetail" class="close-detail">Cerrar</button>
       </div>
     </section>
   </main>

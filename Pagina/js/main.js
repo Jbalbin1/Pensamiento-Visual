@@ -34,6 +34,42 @@
   if(window.Bubbles && window.MapChile){
     Bubbles.init?.();
     await MapChile.init?.();            // dibuja mapa y leyenda
+    
+    // --- Toggle de detalle Región Metropolitana ---
+    const grid = document.querySelector('main.grid');
+    const detailBox = document.getElementById('detailBox');
+    const closeBtn = document.getElementById('closeDetail');
+
+    function openDetail(regionName) {
+      // solo abrimos si es Metropolitana; puedes extender a otras regiones
+      if (regionName !== 'Metropolitana') return;
+
+      grid.classList.add('detail-open');
+      // muestra el cuadro y oculta el SVG de burbujas (el CSS ya oculta bubbleStage en detail-open)
+      detailBox.hidden = false;
+
+      // (Opcional) aquí puedes llenar contenido dinámico en detailBox si lo deseas
+      // detailBox.querySelector('h3').textContent = `Detalle — ${regionName}`;
+    }
+
+    function closeDetail() {
+      grid.classList.remove('detail-open');
+      detailBox.hidden = true;
+    }
+
+    // Cerrar con el botón
+    closeBtn?.addEventListener('click', closeDetail);
+
+    // Cerrar al presionar Escape
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') closeDetail();
+    });
+
+    // Escuchar click de regiones desde el módulo del mapa
+    MapChile.onRegionClick((name, node) => {
+      openDetail(name);
+    });
+
 
     function refresh(){
       const y = yearSel.value;
