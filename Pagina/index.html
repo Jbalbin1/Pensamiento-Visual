@@ -9,40 +9,39 @@
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 </head>
 <body>
-  <header class="topbar">
-    <h1> 
-      Inicio
-    </h1>
-    <h1>
-      ¿Necesitas ayuda?
-    </h1>
-  </header>
+  <!-- Header compartido -->
+  <div id="header-placeholder"></div>
+  <script>
+    fetch("header.html")
+      .then(res => res.text())
+      .then(html => { document.getElementById("header-placeholder").innerHTML = html; });
+  </script>
 
-  <div id="satisfaccion">
-    <h2>¿Qué es la satisfacción de la vida?</h2>
-  </div>
-  <div id="definicion"> 
-    <p>
-      La satisfacción de la vida es una medida subjetiva de cómo la
-      persona valora su existencia en el momento, usualmente tomando en
-      consideración factores de salud, seguridad, felicidad, entre otros.
-    </p>
-  </div>
-
-  <div id="DelitosVIFSatisfacción">
-    <h1>Delitos, VIF y Satisfacción:</h1>
-    <div class="controls">
-      <label for="yearSel"></label>
-      <select id="yearSel"></select>
+  <main class="grid" id="stats">
+    <div id="satisfaccion">
+      <h2>¿Qué es la satisfacción de la vida?</h2>
     </div>
-  </div>
 
+    <div id="definicion">
+      <p>
+        La satisfacción de la vida es una medida subjetiva de cómo la
+        persona valora su existencia en el momento, usualmente tomando en
+        consideración factores de salud, seguridad, felicidad, entre otros.
+      </p>
+    </div>
 
-  <main class="grid">
+    <div id="DelitosVIFSatisfacción">
+      <h1>Delitos, VIF y Satisfacción:</h1>
+      <div class="controls">
+        <label for="yearSel"></label>
+        <select id="yearSel"></select>
+      </div>
+    </div>
+
     <section class="panel">
-    <div id="MapaRegion">
-      <h2>Mapa por satisfacción</h2>
-    </div>
+      <div id="MapaRegion">
+        <h2>Mapa por satisfacción</h2>
+      </div>
       <div class="stage">
         <svg id="mapSvg" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
           <g id="mapGroup"></g>
@@ -52,7 +51,7 @@
 
     <section class="panel">
       <div id="Mapaburbujas">
-      <h2>Delitos vs VIF (burbujas)</h2>
+        <h2>Delitos vs VIF (burbujas)</h2>
       </div>
       <div class="stage">
         <svg id="bubbleSvg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>

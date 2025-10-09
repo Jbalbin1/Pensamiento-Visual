@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ayuda</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Fondo azul y espacio para ver el header sticky correctamente */
+    main {
+      min-height: calc(100vh - 60px);
+      background:#1b2547;  /* azul */
+      color:#eef3ff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header compartido -->
+  <div id="header-placeholder"></div>
+  <script>
+    fetch("header.html")
+      .then(res => res.text())
+      .then(html => { document.getElementById("header-placeholder").innerHTML = html; });
+  </script>
+
+  <!-- Contenido de ayuda -->
+  <main>
+    <!-- Aquí luego agregas tu texto -->
+    <div>Sección de ayuda</div>
+  </main>
+</body>
+</html>
