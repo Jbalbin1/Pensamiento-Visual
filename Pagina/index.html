@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prototipo — Visualización de datos</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Delitos, VIF y Satisfacción</h1>
+    <div class="controls">
+      <label for="yearSel">Año:</label>
+      <select id="yearSel"></select>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel">
+      <h2>Mapa por satisfacción</h2>
+      <div class="stage">
+        <svg id="mapSvg" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
+          <g id="mapGroup"></g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Delitos vs VIF (burbujas)</h2>
+      <div class="stage">
+        <svg id="bubbleSvg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/bubbles.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

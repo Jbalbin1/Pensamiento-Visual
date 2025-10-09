@@ -1,0 +1,26 @@
+{
+  "years": [2021, 2022, 2023],
+  "rows": {
+    "2021": [
+      { "region": "Arica y Parinacota", "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6 },
+      { "region": "Tarapacá",            "delitos": 1.30, "vif": 1.40, "satisfaccion": 75.8 },
+      { "region": "Antofagasta",         "delitos": 1.17, "vif": 0.80, "satisfaccion": 78.6 },
+      { "region": "Atacama",             "delitos": 1.24, "vif": 0.83, "satisfaccion": 81.5 },
+      { "region": "Coquimbo",            "delitos": 1.12, "vif": 0.73, "satisfaccion": 80.4 },
+      { "region": "Valparaíso",          "delitos": 1.20, "vif": 0.73, "satisfaccion": 79.3 },
+      { "region": "Metropolitana",       "delitos": 0.98, "vif": 0.59, "satisfaccion": 75.5 },
+      { "region": "O'Higgins",           "delitos": 1.25, "vif": 0.81, "satisfaccion": 78.9 },
+      { "region": "Maule",               "delitos": 1.06, "vif": 0.80, "satisfaccion": 79.0 },
+      { "region": "Ñuble",               "delitos": 0.97, "vif": 0.73, "satisfaccion": 80.1 },
+      { "region": "Biobío",              "delitos": 1.00, "vif": 0.79, "satisfaccion": 79.2 },
+      { "region": "Araucanía",           "delitos": 1.15, "vif": 0.92, "satisfaccion": 79.7 },
+      { "region": "Los Ríos",            "delitos": 1.11, "vif": 0.85, "satisfaccion": 80.7 },
+      { "region": "Los Lagos",           "delitos": 1.27, "vif": 1.03, "satisfaccion": 78.9 },
+      { "region": "Aysén",               "delitos": 1.36, "vif": 0.93, "satisfaccion": 83.3 },
+      { "region": "Magallanes",          "delitos": 0.98, "vif": 0.69, "satisfaccion": 82.8 }
+    ],
+    "2022": [],
+    "2023": []
+  }
+}
+
