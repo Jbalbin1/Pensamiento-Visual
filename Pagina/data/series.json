@@ -1,5 +1,5 @@
 {
-  "years": [2021, 2022, 2023],
+  "years": [2021, 2023],
   "rows": {
     "2021": [
       { "region": "Arica y Parinacota", "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6 },
@@ -19,7 +19,6 @@
       { "region": "Aysén",               "delitos": 1.36, "vif": 0.93, "satisfaccion": 83.3 },
       { "region": "Magallanes",          "delitos": 0.98, "vif": 0.69, "satisfaccion": 82.8 }
     ],
-    "2022": [],
     "2023": []
   }
 }
