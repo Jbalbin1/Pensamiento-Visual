@@ -1,8 +1,8 @@
 {
-  "years": [2021, 2023],
+  "years": [2021, 2022, 2023],
   "rows": {
     "2021": [
-      { "region": "Arica y Parinacota",  "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6 },
+      { "region": "Arica y Parinacota", "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6 },
       { "region": "Tarapacá",            "delitos": 1.30, "vif": 1.40, "satisfaccion": 75.8 },
       { "region": "Antofagasta",         "delitos": 1.17, "vif": 0.80, "satisfaccion": 78.6 },
       { "region": "Atacama",             "delitos": 1.24, "vif": 0.83, "satisfaccion": 81.5 },
@@ -19,6 +19,7 @@
       { "region": "Aysén",               "delitos": 1.36, "vif": 0.93, "satisfaccion": 83.3 },
       { "region": "Magallanes",          "delitos": 0.98, "vif": 0.69, "satisfaccion": 82.8 }
     ],
+    "2022": [],
     "2023": []
   }
 }
