@@ -1,4 +1,9 @@
-:root{ --bg:#0b1020; --ink:#eef3ff; --panel:#11162a; --muted:#96a0c8; }
+:root{
+  --bg:#0b1020; --ink:#eef3ff; --panel:#11162a; --muted:#96a0c8;
+  --pink1:#ff5ea8;   
+  --pink2:#ff3f8e;
+  --pinkGlow: rgba(255, 98, 172, .45);
+}
 *{ box-sizing:border-box }
 html,body{ height:100% }
 body{ margin:0; background:#0b1020; color:var(--ink); font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -214,7 +219,7 @@ svg{ width:100%; height:100%; }
 
 /* Botonera del header */
 .topbar { justify-content: center; }       /* centra la nav en la barra */
-.nav { display:flex; gap: 20px; }          /* separación entre botones */
+
 
 /* Estilos de botón */
 .btn{
@@ -233,13 +238,7 @@ svg{ width:100%; height:100%; }
 .btn:hover{ background:#2a3a6f; }
 .btn:active{ transform: translateY(1px); }
 
-/* Botón de ayuda con leve acento distinto (opcional) */
-.btn-help{
-  border-color:#5a7dff;
-}
-.btn-help:hover{
-  background:#2d3e8a;
-}
+
 .topbar { z-index: 1000; }
 
 /* Transición del mapa cuando hay detalle abierto */
@@ -254,16 +253,53 @@ svg{ width:100%; height:100%; }
 #legend text{ fill:#cbd6ff }
 
 
-/* KPIs */
+/* KPIs (GRANDES) */
 .kpi-row{
-  display:grid; grid-template-columns: repeat(3,1fr);
-  gap: 14px; margin: 10px 0 6px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 14px 0 10px;
 }
-.kpi{ background:#1e2b54; border:1px solid #2b3a6e; border-radius:12px; padding:10px 12px; text-align:center; }
-.kpi .icon{ font-size:24px; opacity:.9; }
-.kpi .value{ font-size:44px; font-weight:800; letter-spacing:.5px; }
-.kpi .sub{ font-size:12px; color:#cbd6ff; opacity:.85; margin-top:2px; }
-.kpi .rank{ font-size:12px; color:#9fb3ff; margin-top:4px; }
+.kpi{
+  background:#1e2b54;
+  border:1px solid #2b3a6e;
+  border-radius:14px;
+  padding:14px 16px;
+  text-align:center;
+}
+.kpi .icon{
+  font-size:46px; line-height:1; opacity:.95;
+  margin-bottom:4px;
+}
+.kpi .value{
+  font-size:54px; font-weight:800; letter-spacing:.3px;
+  line-height:1.05;
+}
+kpi.sub{
+  font-size:30px;
+  line-height:1.35;
+  color:#e1e7ff;
+  opacity:1;
+  margin-top:8px;       /* un poco más de aire bajo el número */
+  letter-spacing:.2px;
+}
+.kpi .rank{
+  font-size:23px;
+  line-height:1.35;
+  color:#a9bcff;
+  margin-top:6px;
+}
+
+
+/* Ajustes móviles para que no se desborde */
+@media (max-width: 900px){
+    .kpi-row{ grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kpi .icon{ font-size:36px; }
+    .kpi .value{ font-size:42px; }
+    .kpi .sub{ font-size:23px; }
+    .kpi .rank{ font-size:19px; }
+
+}
 
 
 /* Dos tarjetas */
@@ -308,9 +344,7 @@ svg{ width:100%; height:100%; }
 html { scroll-behavior: smooth; }
 #inicio, #stats, #motivacion { scroll-margin-top: 90px; }
 
-/* ===== Secciones genéricas ===== */
-.section { padding: 32px 18px; }
-.section .container { max-width: 1100px; margin: 0 auto; }
+
 
 /* Hero (Inicio) */
 .hero h1 {
@@ -357,14 +391,17 @@ body {
 /* Contenedor de la nav para no estirar de más en pantallas muy grandes */
 .nav {
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
+  max-width: none;          /* antes: 1100px */
+  margin: 0;                /* antes: 0 auto */
   display: flex;
-  gap: 18px;
-  justify-content: center;
   align-items: center;
-  flex-wrap: wrap; /* evita que se rompa en móvil */
+  justify-content: center;  /* mantiene centrados los otros botones */
+  gap: 18px;
+  flex-wrap: wrap;
+  position: relative;       /* referencia para el absolute del help */
+  padding-right: 260px;     /* reserva espacio para el botón rosa */
 }
+.nav-left{ display:flex; gap:32px; flex-wrap:wrap; }
 
 /* ===== Botones: pill, micro-animaciones y foco accesible ===== */
 .btn{
@@ -395,11 +432,13 @@ body {
 }
 
 /* Botón de ayuda con leve acento */
-.btn-help{
-  border-color:#5a7dff;
-  background: linear-gradient(180deg, #21306a, #1a2552);
+
+.btn-help:focus-visible{
+  box-shadow:
+    0 0 0 3px rgba(255, 170, 210, .45),
+    0 10px 30px var(--pinkGlow);
+  border-color:#ffd2e7;
 }
-.btn-help:hover{ background: linear-gradient(180deg, #2b3c86, #22306b); }
 
 /* ===== Indicador “activo” (scroll-spy) ===== */
 .btn.is-active{
@@ -421,7 +460,6 @@ body {
 
 /* ===== Detalles visuales coherentes con tu UI (secciones nuevas) ===== */
 .section { padding: 32px 18px; }
-.section .container { max-width: 1100px; margin: 0 auto; }
 
 .hero h1 { margin:0 0 10px; font-size:42px; color:#e5ebff; }
 .hero h2 { margin:24px 0 8px; font-size:28px; color:#cbd6ff; }
@@ -461,9 +499,158 @@ body {
 }
 
 
+/* === HERO y MOTIVACIÓN realmente full-width === */
+#inicio.section.hero,
+#motivacion.section.motivation {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #0b1020;
+  padding: 100px 8vw;
+}
+
+/* Forzamos el contenido interno a ocupar todo el ancho */
+#inicio.section.hero .container,
+#motivacion.section.motivation .container {
+  max-width: none !important;
+  width: 100%;
+  margin: 0;
+  padding: 0 8vw;
+}
+
+/* --- Tipografía del INICIO --- */
+#inicio h1 {
+  font-size: clamp(64px, 8vw, 100px);
+  line-height: 1.05;
+  margin-bottom: 28px;
+}
+#inicio h2 {
+  font-size: clamp(42px, 5vw, 68px);
+  margin: 40px 0 18px;
+}
+#inicio p,
+#inicio li {
+  font-size: clamp(24px, 2.6vw, 30px);
+  line-height: 1.8;
+}
+
+/* --- Sección MOTIVACIÓN --- */
+#motivacion {
+  background: linear-gradient(180deg, #11162a 0%, #0b1020 100%);
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+#motivacion h2 {
+  font-size: clamp(56px, 6vw, 90px);
+  margin-bottom: 48px;
+}
+#motivacion .tip h3 {
+  font-size: clamp(28px, 3.2vw, 40px);
+}
+#motivacion .tip p {
+  font-size: clamp(22px, 2.5vw, 28px);
+  line-height: 1.75;
+}
+
+/* Tips más amplios y centrados */
+#motivacion .tips {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 36px;
+}
+#motivacion .tip {
+  padding: 32px;
+  border-radius: 20px;
+}
+
+/* CTA grande */
+#motivacion .cta-text {
+  font-size: clamp(30px, 3vw, 40px);
+  text-align: center;
+  margin-top: 70px;
+}
+#motivacion .cta-btn {
+  font-size: clamp(24px, 2.5vw, 34px);
+  padding: 16px 36px;
+  border-radius: 999px;
+  margin-top: 24px;
+}
+
+
+/* === BOTONES SUPERIORES (HEADER) GRANDES === */
+.topbar {
+  padding: 24px 40px;                 /* más alto y con más aire lateral */
+  gap: 40px;                          /* separación entre botones */
+}
 
 
 
+.btn {
+  font-size: clamp(22px, 2.5vw, 32px); /* tamaño grande y fluido */
+  padding: 18px 36px;                 /* más área de clic */
+  border-radius: 999px;
+  border-width: 2px;
+  font-weight: 600;
+  background: linear-gradient(180deg, #1c2850, #152040);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: transform 0.08s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Efecto hover más notorio */
+.btn:hover {
+  background: linear-gradient(180deg, #2b3c7a, #1f2b55);
+  border-color: #5d82ff;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(9,14,30,0.5);
+}
+
+/* Botón activo (scroll-spy) */
+.btn.is-active {
+  border-color: #8aa2ff;
+  background: linear-gradient(180deg, #3349a2, #243372);
+  box-shadow: 0 0 0 3px rgba(138,162,255,0.3), 0 10px 30px rgba(9,14,30,0.55);
+}
 
 
+/* Ajuste responsive para móviles */
+@media (max-width: 900px) {
+  .btn {
+    font-size: 20px;
+    padding: 14px 28px;
+  }
+  .topbar {
+    gap: 20px;
+    padding: 18px 20px;
+  }
+}
 
+/* --- FINAL: botón de ayuda rosado y alineado a la derecha --- */
+.nav{
+  position: relative;         /* contenedor de referencia */
+  padding-right: 260px;       /* espacio para el botón */
+}
+
+.btn-help{
+  background: linear-gradient(180deg, var(--pink1), var(--pink2));
+  border-color: #ffc6e0;
+  color: #fff;
+
+  position: absolute;
+  right: 40px;                /* borde derecho */
+  top: 50%;
+  transform: translateY(-50%);
+
+  box-shadow:
+    0 8px 24px var(--pinkGlow),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+.btn-help:hover{
+  background: linear-gradient(180deg, #ff77b5, #ff4f98);
+  transform: translateY(-52%) scale(1.05);
+  box-shadow:
+    0 12px 32px var(--pinkGlow),
+    0 0 0 2px rgba(255,170,210,.35) inset;
+}
