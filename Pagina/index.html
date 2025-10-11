@@ -60,11 +60,57 @@
 
     <section class="panel panel-detail">
       <div id="detailBox" class="detail-box" hidden>
-        <h3>Detalle — Región Metropolitana</h3>
-        <p>Aquí va tu información de la región (texto, cifras, gráficos, etc.).</p>
+        <h3 id="detailTitle">Detalle — Región</h3>
+
+        <!-- región duplicada (más pequeña) -->
+        <svg id="detailRegionSvg" width="220" height="140"></svg>
+
+        <!-- KPIs principales -->
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="icon">😊</div>
+            <div class="value" id="satValue">—</div>
+            <div class="sub">Satisfacción</div>
+            <div class="rank" id="satRank">—</div>
+          </div>
+          <div class="kpi">
+            <div class="icon">🏠</div>
+            <div class="value" id="vifValue">—</div>
+            <div class="sub">VIF</div>
+            <div class="rank" id="vifRank">—</div>
+          </div>
+          <div class="kpi">
+            <div class="icon">🔗</div>
+            <div class="value" id="delValue">—</div>
+            <div class="sub">Delitos</div>
+            <div class="rank" id="delRank">—</div>
+          </div>
+        </div>
+
+        <!-- 2 tarjetas: VIF desglosado y delitos estudiados -->
+        <div class="cards-2">
+          <div class="card">
+            <h4>Violencia intrafamiliar</h4>
+            <div class="pill">
+              <span>Psicológica</span>
+              <strong id="vifPsico">—</strong>
+            </div>
+            <div class="pill">
+              <span>Física</span>
+              <strong id="vifFisica">—</strong>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Delitos estudiados</h4>
+            <ul id="delitosList" class="bullets"></ul>
+          </div>
+        </div>
+
         <button id="closeDetail" class="close-detail">Cerrar</button>
       </div>
     </section>
+
   </main>
 
   <script src="js/bubbles.js"></script>

@@ -1,25 +1,53 @@
 {
-  "years": [2021, 2023],
+  "years": [
+    2021,
+    2023
+  ],
+  "delitos_estudiados": [
+    "Robo con violencia",
+    "Robo por sorpresa",
+    "Robo con fuerza en la vivienda",
+    "Hurto",
+    "Lesiones",
+    "Robo de vehículos",
+    "Robo desde vehículos"
+  ],
   "rows": {
     "2021": [
-      { "region": "Arica y Parinacota", "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6 },
-      { "region": "Tarapacá",            "delitos": 1.30, "vif": 1.40, "satisfaccion": 75.8 },
-      { "region": "Antofagasta",         "delitos": 1.17, "vif": 0.80, "satisfaccion": 78.6 },
-      { "region": "Atacama",             "delitos": 1.24, "vif": 0.83, "satisfaccion": 81.5 },
-      { "region": "Coquimbo",            "delitos": 1.12, "vif": 0.73, "satisfaccion": 80.4 },
-      { "region": "Valparaíso",          "delitos": 1.20, "vif": 0.73, "satisfaccion": 79.3 },
-      { "region": "Metropolitana",       "delitos": 0.98, "vif": 0.59, "satisfaccion": 75.5 },
-      { "region": "O'Higgins",           "delitos": 1.25, "vif": 0.81, "satisfaccion": 78.9 },
-      { "region": "Maule",               "delitos": 1.06, "vif": 0.80, "satisfaccion": 79.0 },
-      { "region": "Ñuble",               "delitos": 0.97, "vif": 0.73, "satisfaccion": 80.1 },
-      { "region": "Biobío",              "delitos": 1.00, "vif": 0.79, "satisfaccion": 79.2 },
-      { "region": "Araucanía",           "delitos": 1.15, "vif": 0.92, "satisfaccion": 79.7 },
-      { "region": "Los Ríos",            "delitos": 1.11, "vif": 0.85, "satisfaccion": 80.7 },
-      { "region": "Los Lagos",           "delitos": 1.27, "vif": 1.03, "satisfaccion": 78.9 },
-      { "region": "Aysén",               "delitos": 1.36, "vif": 0.93, "satisfaccion": 83.3 },
-      { "region": "Magallanes",          "delitos": 0.98, "vif": 0.69, "satisfaccion": 82.8 }
+      { "region": "Arica y Parinacota", "delitos": 1.38, "vif": 1.19, "satisfaccion": 74.6, "vif_psicologica": 57.9, "vif_fisica": 39.3 },
+      { "region": "Tarapacá", "delitos": 1.3, "vif": 1.4, "satisfaccion": 75.8, "vif_psicologica": 61.7, "vif_fisica": 37.3 },
+      { "region": "Antofagasta", "delitos": 1.17, "vif": 0.8, "satisfaccion": 78.6, "vif_psicologica": 40.5, "vif_fisica": 35.0 },
+      { "region": "Atacama", "delitos": 1.24, "vif": 0.83, "satisfaccion": 81.5, "vif_psicologica": 46.9, "vif_fisica": 39.4 },
+      { "region": "Coquimbo", "delitos": 1.12, "vif": 0.73, "satisfaccion": 80.4, "vif_psicologica": 43.5, "vif_fisica": 38.1 },
+      { "region": "Valparaíso", "delitos": 1.2, "vif": 0.73, "satisfaccion": 79.3, "vif_psicologica": 47.6, "vif_fisica": 37.8 },
+      { "region": "Metropolitana", "delitos": 0.98, "vif": 0.59, "satisfaccion": 75.5, "vif_psicologica": 59.9, "vif_fisica": 37.5 },
+      { "region": "O'Higgins", "delitos": 1.25, "vif": 0.81, "satisfaccion": 78.9, "vif_psicologica": 46.1, "vif_fisica": 40.2 },
+      { "region": "Maule", "delitos": 1.06, "vif": 0.8, "satisfaccion": 79.0, "vif_psicologica": 52.9, "vif_fisica": 38.1 },
+      { "region": "Ñuble", "delitos": 0.97, "vif": 0.73, "satisfaccion": 80.1, "vif_psicologica": 53.6, "vif_fisica": 36.6 },
+      { "region": "Biobío", "delitos": 1.0, "vif": 0.79, "satisfaccion": 79.2, "vif_psicologica": 60.7, "vif_fisica": 36.8 },
+      { "region": "Araucanía", "delitos": 1.15, "vif": 0.92, "satisfaccion": 79.7, "vif_psicologica": 63.1, "vif_fisica": 36.2 },
+      { "region": "Los Ríos", "delitos": 1.11, "vif": 0.85, "satisfaccion": 80.7, "vif_psicologica": 63.3, "vif_fisica": 36.6 },
+      { "region": "Los Lagos", "delitos": 1.27, "vif": 1.03, "satisfaccion": 78.9, "vif_psicologica": 60.8, "vif_fisica": 39.3 },
+      { "region": "Aysén", "delitos": 1.36, "vif": 0.93, "satisfaccion": 83.3, "vif_psicologica": 49.6, "vif_fisica": 38.9 },
+      { "region": "Magallanes", "delitos": 1.09, "vif": 0.62, "satisfaccion": 86.2, "vif_psicologica": 60.8, "vif_fisica": 37.7 }
     ],
-    "2023": []
+    "2023": [
+      { "region": "Arica y Parinacota", "delitos": 1.54, "vif": 1.18, "satisfaccion": 74.5, "vif_psicologica": 56.9, "vif_fisica": 39.2 },
+      { "region": "Tarapacá", "delitos": 1.5, "vif": 1.4, "satisfaccion": 80.0, "vif_psicologica": 57.8, "vif_fisica": 37.3 },
+      { "region": "Antofagasta", "delitos": 1.42, "vif": 0.79, "satisfaccion": 78.6, "vif_psicologica": 44.3, "vif_fisica": 39.2 },
+      { "region": "Atacama", "delitos": 1.46, "vif": 0.83, "satisfaccion": 83.1, "vif_psicologica": 53.7, "vif_fisica": 38.0 },
+      { "region": "Coquimbo", "delitos": 1.43, "vif": 0.83, "satisfaccion": 85.7, "vif_psicologica": 61.1, "vif_fisica": 40.0 },
+      { "region": "Valparaíso", "delitos": 1.43, "vif": 0.73, "satisfaccion": 78.4, "vif_psicologica": 52.9, "vif_fisica": 37.7 },
+      { "region": "Metropolitana", "delitos": 1.16, "vif": 0.59, "satisfaccion": 76.3, "vif_psicologica": 53.7, "vif_fisica": 37.9 },
+      { "region": "O'Higgins", "delitos": 1.52, "vif": 0.82, "satisfaccion": 81.7, "vif_psicologica": 60.7, "vif_fisica": 40.1 },
+      { "region": "Maule", "delitos": 1.36, "vif": 0.81, "satisfaccion": 79.2, "vif_psicologica": 66.9, "vif_fisica": 38.9 },
+      { "region": "Ñuble", "delitos": 1.24, "vif": 0.74, "satisfaccion": 78.8, "vif_psicologica": 62.9, "vif_fisica": 38.3 },
+      { "region": "Biobío", "delitos": 1.19, "vif": 0.7, "satisfaccion": 79.9, "vif_psicologica": 63.3, "vif_fisica": 39.2 },
+      { "region": "Araucanía", "delitos": 1.4, "vif": 0.85, "satisfaccion": 78.2, "vif_psicologica": 60.8, "vif_fisica": 38.7 },
+      { "region": "Los Ríos", "delitos": 1.37, "vif": 0.85, "satisfaccion": 78.8, "vif_psicologica": 63.5, "vif_fisica": 36.1 },
+      { "region": "Los Lagos", "delitos": 1.4, "vif": 0.99, "satisfaccion": 79.3, "vif_psicologica": 68.3, "vif_fisica": 36.6 },
+      { "region": "Aysén", "delitos": 1.23, "vif": 0.68, "satisfaccion": 84.4, "vif_psicologica": 49.6, "vif_fisica": 38.9 },
+      { "region": "Magallanes", "delitos": 1.52, "vif": 0.67, "satisfaccion": 86.2, "vif_psicologica": 60.8, "vif_fisica": 37.7 }
+    ]
   }
 }
-

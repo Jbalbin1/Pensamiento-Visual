@@ -75,6 +75,7 @@ window.MapChile = (function () {
       handler(regionName(f), this);
     });
   }
+  return { init, colorize, onRegionClick };
 
   // ---------- Leyenda ----------
   function drawLegend(){

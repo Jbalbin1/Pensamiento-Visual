@@ -262,3 +262,98 @@ svg{ width:100%; height:100%; }
 }
 .topbar { z-index: 1000; }
 
+/* Transición del mapa cuando hay detalle abierto */
+.grid.detail-open #mapSvg{
+  transition: transform 420ms ease;
+  transform: translateX(-18px) scale(.96);
+}
+
+/* KPIs del detalle */
+.kpi-row{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 10px 0 6px;
+}
+.kpi{
+  background:#1e2b54;
+  border:1px solid #2b3a6e;
+  border-radius:12px;
+  padding:10px 12px;
+  text-align:center;
+}
+.kpi .icon{ font-size:28px; line-height:1; opacity:.9; }
+.kpi .value{ font-size:40px; font-weight:800; letter-spacing:.5px; }
+.kpi .sub{ font-size:12px; color:#cbd6ff; opacity:.85; margin-top:2px; }
+.kpi .rank{ font-size:12px; color:#9fb3ff; margin-top:4px; }
+
+/* SVG destino en el detalle */
+#detailRegionSvg{
+  display:block;
+  margin: 2px 0 6px;
+  border-radius:10px;
+}
+
+/* Capa para el “vuelo” de la región (overlay) */
+#flyLayer{
+  position:fixed; inset:0; pointer-events:none; z-index: 999;
+}
+#flyLayer svg{ position:absolute; left:0; top:0; overflow:visible; }
+.fly-shape{ transition: transform 520ms cubic-bezier(.2,.8,.2,1), opacity 200ms; }
+
+/* Mejora legibilidad de la leyenda (si la tienes) */
+#legend text{ fill:#cbd6ff }
+
+
+/* Transición del mapa + escala leve cuando hay detalle */
+.grid.detail-open #mapSvg{
+  transition: transform 420ms ease;
+  transform: translateX(-18px) scale(.96);
+}
+
+/* KPIs */
+.kpi-row{
+  display:grid; grid-template-columns: repeat(3,1fr);
+  gap: 14px; margin: 10px 0 6px;
+}
+.kpi{ background:#1e2b54; border:1px solid #2b3a6e; border-radius:12px; padding:10px 12px; text-align:center; }
+.kpi .icon{ font-size:24px; opacity:.9; }
+.kpi .value{ font-size:44px; font-weight:800; letter-spacing:.5px; }
+.kpi .sub{ font-size:12px; color:#cbd6ff; opacity:.85; margin-top:2px; }
+.kpi .rank{ font-size:12px; color:#9fb3ff; margin-top:4px; }
+
+/* Dos tarjetas */
+.cards-2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:8px; }
+.card{ background:#1b274d; border:1px solid #2b3a6e; border-radius:12px; padding:12px 14px; }
+.card h4{ margin:0 0 8px; color:#e5ebff; font-size:16px; }
+
+/* Pastillas VIF */
+.pill{ display:flex; justify-content:space-between; align-items:center; gap:8px;
+  background:#0f1a3a; border:1px solid #2b3a6e; border-radius:999px; padding:8px 12px; margin-bottom:8px; }
+.pill span{ color:#cbd6ff; font-size:13px; }
+.pill strong{ font-size:26px; }
+
+/* Lista bullets */
+.bullets{ margin:8px 0 0; padding-left:20px; }
+.bullets li{ margin:4px 0; }
+
+/* Región en detalle más chica */
+#detailRegionSvg{ display:block; margin: 2px 0 6px; border-radius:8px; }
+
+/* Botón cerrar: más grande y con flecha */
+.close-detail{
+  background:#1b2547; color:var(--ink);
+  border:1px solid #3b4a7a; border-radius:10px;
+  padding:10px 18px; font-size:16px; cursor:pointer;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.close-detail::before{ content:"←"; font-size:18px; }
+.close-detail:hover{ background:#2a3a6f; }
+
+/* Capa de vuelo */
+#flyLayer{ position:fixed; inset:0; pointer-events:none; z-index: 999; }
+#flyLayer svg{ position:absolute; left:0; top:0; overflow:visible; }
+.fly-shape{
+  will-change: transform, opacity;
+  transition: transform 560ms cubic-bezier(.22,.61,.36,1), opacity 240ms ease;
+}
