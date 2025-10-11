@@ -4,6 +4,11 @@
   --pink2:#ff3f8e;
   --pinkGlow: rgba(255, 98, 172, .45);
 }
+/* Aleja toda la página al 80 % */
+html {
+  zoom: 75%;        /* Chrome, Edge, Firefox 105+ */
+}
+
 *{ box-sizing:border-box }
 html,body{ height:100% }
 body{ margin:0; background:#0b1020; color:var(--ink); font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
