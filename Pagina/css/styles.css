@@ -8,17 +8,6 @@ svg{ width:100%; height:100%; }
 @media (max-width:1024px){ .grid{ grid-template-columns:1fr } .stage{ height:420px } }
 .region { stroke:#0b1739; stroke-width:1; }
 
-.topbar{ 
-    display:flex; 
-    align-items:center; 
-    gap: 12px; 
-    padding:12px 16px; 
-    border-bottom:1px solid #1a2444; 
-    background:#0d1430; 
-    position:sticky; 
-    top:0; 
-}
-
 /*PANEL*/
 .panel{ 
     background:var(--panel); 
@@ -59,11 +48,6 @@ svg{ width:100%; height:100%; }
   background-color: #243566;
 }
 
-#satisfaccion{
-    text-align: center;
-    font-size: 80px;
-}
-
 #definicion{
     text-align: center;
     font-size: 60px;
@@ -91,10 +75,6 @@ svg{ width:100%; height:100%; }
 }
 
 /*GRID*/
-
-.grid.detail-open #mapSvg{
-  transform: translateX(-10px); /* pega el mapa al margen izquierdo */
-}
 
 .grid{
   display: grid;
@@ -268,48 +248,11 @@ svg{ width:100%; height:100%; }
   transform: translateX(-18px) scale(.96);
 }
 
-/* KPIs del detalle */
-.kpi-row{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 10px 0 6px;
-}
-.kpi{
-  background:#1e2b54;
-  border:1px solid #2b3a6e;
-  border-radius:12px;
-  padding:10px 12px;
-  text-align:center;
-}
-.kpi .icon{ font-size:28px; line-height:1; opacity:.9; }
-.kpi .value{ font-size:40px; font-weight:800; letter-spacing:.5px; }
-.kpi .sub{ font-size:12px; color:#cbd6ff; opacity:.85; margin-top:2px; }
-.kpi .rank{ font-size:12px; color:#9fb3ff; margin-top:4px; }
 
-/* SVG destino en el detalle */
-#detailRegionSvg{
-  display:block;
-  margin: 2px 0 6px;
-  border-radius:10px;
-}
-
-/* Capa para el “vuelo” de la región (overlay) */
-#flyLayer{
-  position:fixed; inset:0; pointer-events:none; z-index: 999;
-}
-#flyLayer svg{ position:absolute; left:0; top:0; overflow:visible; }
-.fly-shape{ transition: transform 520ms cubic-bezier(.2,.8,.2,1), opacity 200ms; }
 
 /* Mejora legibilidad de la leyenda (si la tienes) */
 #legend text{ fill:#cbd6ff }
 
-
-/* Transición del mapa + escala leve cuando hay detalle */
-.grid.detail-open #mapSvg{
-  transition: transform 420ms ease;
-  transform: translateX(-18px) scale(.96);
-}
 
 /* KPIs */
 .kpi-row{
@@ -322,16 +265,17 @@ svg{ width:100%; height:100%; }
 .kpi .sub{ font-size:12px; color:#cbd6ff; opacity:.85; margin-top:2px; }
 .kpi .rank{ font-size:12px; color:#9fb3ff; margin-top:4px; }
 
+
 /* Dos tarjetas */
 .cards-2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:8px; }
 .card{ background:#1b274d; border:1px solid #2b3a6e; border-radius:12px; padding:12px 14px; }
-.card h4{ margin:0 0 8px; color:#e5ebff; font-size:16px; }
+.card h4{ margin:0 0 8px; color:#e5ebff; font-size: 30px; }
 
 /* Pastillas VIF */
 .pill{ display:flex; justify-content:space-between; align-items:center; gap:8px;
   background:#0f1a3a; border:1px solid #2b3a6e; border-radius:999px; padding:8px 12px; margin-bottom:8px; }
-.pill span{ color:#cbd6ff; font-size:13px; }
-.pill strong{ font-size:26px; }
+.pill span{ color:#cbd6ff; font-size:25px; }
+.pill strong{ font-size:30px; }
 
 /* Lista bullets */
 .bullets{ margin:8px 0 0; padding-left:20px; }
@@ -357,3 +301,169 @@ svg{ width:100%; height:100%; }
   will-change: transform, opacity;
   transition: transform 560ms cubic-bezier(.22,.61,.36,1), opacity 240ms ease;
 }
+
+
+
+/* ===== One-page: scroll suave y compensación por header sticky ===== */
+html { scroll-behavior: smooth; }
+#inicio, #stats, #motivacion { scroll-margin-top: 90px; }
+
+/* ===== Secciones genéricas ===== */
+.section { padding: 32px 18px; }
+.section .container { max-width: 1100px; margin: 0 auto; }
+
+/* Hero (Inicio) */
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 42px;
+  color: #e5ebff;
+}
+.hero h2 {
+  margin: 26px 0 8px;
+  font-size: 28px;
+  color: #cbd6ff;
+}
+.hero p {
+  margin: 0 0 10px;
+  color: #dbe3ff;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* Motivación */
+.motivation h2 { font-size: 32px; color:#e5ebff; margin: 0 0 18px; }
+
+@media (max-width: 900px){
+  .tips { grid-template-columns: 1fr; }
+}
+
+
+body {
+  padding-top: 80px; /* Ajusta según la altura real del header */
+}
+
+
+/* ===== Topbar “glass” + mejor spacing ===== */
+.topbar {
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  background: linear-gradient(180deg, rgba(13,20,48,.86), rgba(13,20,48,.70));
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  border-bottom: 1px solid rgba(26,36,68,.65);
+  padding: 14px 20px;
+  gap: 28px; /* más aire entre botones */
+}
+
+/* Contenedor de la nav para no estirar de más en pantallas muy grandes */
+.nav {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* evita que se rompa en móvil */
+}
+
+/* ===== Botones: pill, micro-animaciones y foco accesible ===== */
+.btn{
+  position: relative;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid #31437a;
+  background: linear-gradient(180deg, #1b2547, #172140);
+  color: var(--ink);
+  font-size: 16px;             /* mantenemos legible sin ser gigante */
+  letter-spacing: .2px;
+  text-decoration: none;
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  box-shadow: 0 6px 16px rgba(9,14,30,.25), inset 0 1px 0 rgba(255,255,255,.03);
+  outline: none;
+}
+.btn:hover{
+  background: linear-gradient(180deg, #243566, #1b274d);
+  border-color: #3c56a0;
+  box-shadow: 0 10px 22px rgba(9,14,30,.35), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.btn:active{ transform: translateY(1px) scale(.99); }
+.btn:focus-visible{
+  box-shadow:
+    0 0 0 3px rgba(93, 130, 255, .25),
+    0 8px 24px rgba(9,14,30,.35);
+  border-color: #5d82ff;
+}
+
+/* Botón de ayuda con leve acento */
+.btn-help{
+  border-color:#5a7dff;
+  background: linear-gradient(180deg, #21306a, #1a2552);
+}
+.btn-help:hover{ background: linear-gradient(180deg, #2b3c86, #22306b); }
+
+/* ===== Indicador “activo” (scroll-spy) ===== */
+.btn.is-active{
+  border-color:#8aa2ff;
+  background: linear-gradient(180deg, #2b3b7a, #223169);
+  box-shadow:
+    0 0 0 2px rgba(138,162,255,.18),
+    0 10px 26px rgba(9,14,30,.45);
+}
+.btn.is-active::after{
+  content:"";
+  position:absolute;
+  left: 16px; right:16px; bottom:-6px;
+  height:3px; border-radius:3px;
+  background: linear-gradient(90deg, #90a7ff, #5d82ff);
+  opacity:.9;
+}
+
+
+/* ===== Detalles visuales coherentes con tu UI (secciones nuevas) ===== */
+.section { padding: 32px 18px; }
+.section .container { max-width: 1100px; margin: 0 auto; }
+
+.hero h1 { margin:0 0 10px; font-size:42px; color:#e5ebff; }
+.hero h2 { margin:24px 0 8px; font-size:28px; color:#cbd6ff; }
+.hero p  { margin:0 0 10px; color:#dbe3ff; font-size:18px; line-height:1.6; }
+
+.motivation h2 { font-size: 32px; color:#e5ebff; margin: 0 0 18px; }
+.tips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.tip {
+  background:#11162a;
+  border:1px solid #1b2747;
+  border-radius: 14px;
+  padding: 14px;
+}
+.tip h3 { margin:0 0 6px; color:#cfd8ff; font-size: 20px; }
+.tip p  { margin:0; color:#bfc8f8; font-size: 16px; line-height:1.5; }
+
+
+@media (max-width: 900px){
+  .tips { grid-template-columns: 1fr; }
+  .btn { font-size: 15px; padding: 9px 14px; }
+  .topbar { gap: 16px; padding: 12px 12px; }
+}
+
+.topbar{
+  position: fixed; top:0; left:0; width:100%; z-index:1000;
+  display:flex; align-items:center; justify-content:center; gap:28px;
+  padding:14px 20px;
+  border-bottom: 1px solid rgba(26,36,68,.65);
+  background: linear-gradient(180deg, rgba(13,20,48,.86), rgba(13,20,48,.70));
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+
+
+
+
+
+
+
+

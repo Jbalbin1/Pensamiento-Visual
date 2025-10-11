@@ -14,22 +14,87 @@
   <script>
     fetch("header.html")
       .then(res => res.text())
-      .then(html => { document.getElementById("header-placeholder").innerHTML = html; });
+      .then(html => {
+        document.getElementById("header-placeholder").innerHTML = html;
+
+        // === Scroll-spy: resalta el botón según sección visible ===
+        const sections = [
+          document.getElementById("inicio"),
+          document.getElementById("stats"),
+          document.getElementById("motivacion"),
+        ].filter(Boolean);
+
+        const linkMap = new Map();
+        // Mapea href -> <a>
+        document.querySelectorAll('.topbar .nav .btn').forEach(a => {
+          const hash = (a.getAttribute('href') || '').split('#')[1];
+          if (hash && document.getElementById(hash)) linkMap.set(hash, a);
+        });
+
+        const setActive = (id) => {
+          document.querySelectorAll('.topbar .nav .btn').forEach(a => a.classList.remove('is-active'));
+          const btn = linkMap.get(id);
+          if (btn) btn.classList.add('is-active');
+        };
+
+        // Observa qué sección está en viewport
+        const obs = new IntersectionObserver((entries) => {
+          // ordena por intersección y escoge la más visible
+          const visible = entries
+            .filter(e => e.isIntersecting)
+            .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (visible) setActive(visible.target.id);
+        }, { rootMargin: '-20% 0px -60% 0px', threshold: [0.25, 0.6, 0.9] });
+
+        sections.forEach(sec => obs.observe(sec));
+
+        // Al hacer click, marcar al tiro (mejor UX)
+        document.querySelectorAll('.topbar .nav .btn[href*="#"]').forEach(a => {
+          a.addEventListener('click', () => {
+            const id = a.getAttribute('href').split('#')[1];
+            if (id) setActive(id);
+          });
+        });
+      });
   </script>
 
+<section id="inicio" class="section hero">
+  <div class="container">
+    <div class="hero-badges">
+      <span class="badge">Datos reales</span>
+      <span class="badge">Chile</span>
+      <span class="badge">Bienestar</span>
+    </div>
+
+    <h1>¿Qué buscamos?</h1>
+    <p class="lead">
+      Que al explorar estos datos <strong>te hagas preguntas</strong>, 
+      <strong>converses</strong> y <strong>mires tu entorno con otros ojos</strong>.
+      Queremos una ciudadanía joven más <em>crítica, empática</em> y con ganas de participar.
+    </p>
+
+    <div class="callout">
+      <p><strong>En simple:</strong> no es solo “informar”, es <strong>mover</strong> a la reflexión y al compromiso.</p>
+    </div>
+
+    <h2>¿Por qué?</h2>
+    <ul class="hero-list">
+      <li>Porque la VIF y los delitos <strong>pegan directo</strong> en cómo sentimos nuestra vida.</li>
+      <li>Porque muchas veces se ven como “lo normal”… y no lo son.</li>
+      <li>Porque con info clara podemos <strong>entender, cuestionar y conversar</strong>.</li>
+    </ul>
+
+    <h2>¿Qué es la satisfacción de la vida?</h2>
+    <p>
+      Es cómo <strong>evalúas tu vida hoy</strong> (salud, seguridad, relaciones, estudio, trabajo, etc.). 
+      No es solo “estar feliz”: es una mirada global de tu bienestar.
+    </p>
+  </div>
+</section>
+
+
   <main class="grid" id="stats">
-    <div id="satisfaccion">
-      <h2>¿Qué es la satisfacción de la vida?</h2>
-    </div>
-
-    <div id="definicion">
-      <p>
-        La satisfacción de la vida es una medida subjetiva de cómo la
-        persona valora su existencia en el momento, usualmente tomando en
-        consideración factores de salud, seguridad, felicidad, entre otros.
-      </p>
-    </div>
-
+  
     <div id="DelitosVIFSatisfacción">
       <h1>Delitos, VIF y Satisfacción:</h1>
       <div class="controls">
@@ -60,7 +125,7 @@
 
     <section class="panel panel-detail">
       <div id="detailBox" class="detail-box" hidden>
-        <h3 id="detailTitle">Detalle — Región</h3>
+        <h1 id="detailTitle">Detalle — Región</h1>
 
         <!-- región duplicada (más pequeña) -->
         <svg id="detailRegionSvg" width="220" height="140"></svg>
@@ -112,7 +177,43 @@
     </section>
 
   </main>
+<section id="motivacion" class="section motivation">
+  <div class="container">
+    <h2>¿Qué puedo hacer como individuo?</h2>
 
+    <div class="tips tips-big">
+      <div class="tip">
+        <h3>1) Habla del tema</h3>
+        <p>Conversar de VIF y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
+      </div>
+      <div class="tip">
+        <h3>2) Arma red</h3>
+        <p>Escucha sin juzgar, comparte info de ayuda y acompaña. <strong>No estás sol@.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>3) Participa</h3>
+        <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>4) Respeto siempre</h3>
+        <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>5) Denuncia responsable</h3>
+        <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
+      </div>
+      <div class="tip highlight">
+        <h3>Tip extra</h3>
+        <p>Usa estos datos para <strong>conversar en clases</strong>, hacer proyectos o propuestas en tu comunidad.</p>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
+      <a href="#stats" class="btn cta-btn">Ir a explorar datos</a>
+    </div>
+  </div>
+</section>
   <script src="js/bubbles.js"></script>
   <script src="js/map.js"></script>
   <script src="js/main.js"></script>
