@@ -3,19 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ayuda</title>
+  <title>¿Necesitas ayuda?</title>
   <link rel="stylesheet" href="css/styles.css" />
   <style>
-    /* Fondo azul y espacio para ver el header sticky correctamente */
     main {
-      min-height: calc(100vh - 60px);
-      background:#1b2547;  /* azul */
-      color:#eef3ff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 24px;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #10162b 0%, #090e20 100%);
+      color: #eef3ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 140px 10vw 120px;
+      text-align: center;
     }
+
+    h1 {
+      font-size: clamp(64px, 8vw, 110px);
+      color: var(--pink1);
+      margin-bottom: 40px;
+      font-weight: 800;
+      line-height: 1.1;
+      text-shadow: 0 0 25px rgba(255, 94, 168, 0.35);
+    }
+
+
+    p {
+        font-size: clamp(26px, 3vw, 36px);
+        line-height: 1.6;
+        color: #f3f6ff;
+        max-width: 1500px;       /* antes 1200px — ahora más contenido centrado */
+        margin: 0 auto 40px;
+        font-weight: 400;
+        }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto 40px;
+      max-width: 850px;
+    }
+
+    li {
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 98, 172, 0.4);
+      border-radius: 20px;
+      padding: 28px 36px;
+      margin-bottom: 26px;
+      font-size: clamp(26px, 3vw, 38px);
+      line-height: 1.6;
+      box-shadow: 0 0 40px rgba(255, 98, 172, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    li:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 0 60px rgba(255, 98, 172, 0.15);
+    }
+
+    li strong {
+      color: var(--pink1);
+      font-size: 1.15em;
+      font-weight: 700;
+    }
+
+    a.volver {
+      display: inline-block;
+      margin-top: 60px;
+      padding: 26px 80px;
+      background: linear-gradient(180deg, var(--pink1), var(--pink2));
+      color: #fff;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: clamp(28px, 3vw, 44px);
+      font-weight: 700;
+      transition: transform 0.25s ease, box-shadow 0.4s ease;
+      box-shadow: 0 12px 40px var(--pinkGlow);
+    }
+
+    a.volver:hover {
+      transform: translateY(-5px) scale(1.07);
+      box-shadow: 0 16px 60px var(--pinkGlow);
+    }
+
+    footer {
+      margin-top: 80px;
+      font-size: clamp(18px, 1.6vw, 24px);
+      opacity: 0.7;
+      color: #e2e5ff;
+    }
+
   </style>
 </head>
 <body>
@@ -27,10 +103,22 @@
       .then(html => { document.getElementById("header-placeholder").innerHTML = html; });
   </script>
 
-  <!-- Contenido de ayuda -->
+  <!-- Contenido -->
   <main>
-    <!-- Aquí luego agregas tu texto -->
-    <div>Sección de ayuda</div>
+    <h1>¿Necesitas hablar con alguien?</h1>
+
+    <p>Si tú o alguien que conoces vive situaciones de miedo o violencia en casa, estas líneas te escuchan, te orientan y son completamente confidenciales:</p>
+
+    <ul>
+      <li><strong>149</strong> – Fono Familia (Carabineros, gratuito 24/7)</li>
+      <li><strong>1455</strong> – Fono de Orientación (SernamEG, confidencial y gratuito)</li>
+      <li><strong>1515</strong> – Línea de Niños, Niñas y Adolescentes (Fundación ANAR)</li>
+    </ul>
+
+    <p>Hablar puede ser el primer paso para cambiar tu historia </p>
+    <p>Si estás en peligro inmediato, llama al <strong>133</strong> o acude a un lugar seguro.<br>Tu bienestar importa.</p>
+
+    <a href="index.html#inicio" class="volver">Volver al inicio</a>
   </main>
 </body>
 </html>
