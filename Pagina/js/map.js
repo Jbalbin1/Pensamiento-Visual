@@ -44,6 +44,49 @@ window.MapChile = (function () {
       g.append('text').attr('x', 20).attr('y', 30).attr('fill', '#f66')
         .text('No se pudo cargar el mapa (revisa data/chile-regions.json)');
     }
+    
+    // mismos tooltip que antes
+const tooltip = d3.select('body')
+  .append('div')
+  .attr('class', 'map-tooltip')
+  .style('position', 'absolute')
+  .style('pointer-events', 'none')
+  .style('opacity', 0)
+  .style('background', 'rgba(17, 22, 42, .95)')
+  .style('color', '#eef3ff')
+  .style('padding', '8px 14px')
+  .style('border-radius', '10px')
+  .style('font-size', '15px')
+  .style('border', '1px solid #3b4a7a')
+  .style('box-shadow', '0 6px 18px rgba(0,0,0,.35)')
+  .style('transition', 'opacity .2s ease');
+
+g.selectAll('path')
+  .on('mouseover', function (event, f) {
+      const name = regionName(f);
+
+      // solo iluminamos; sin scale, sin transform
+      d3.select(this).classed('hover', true);
+
+      // atenuar el resto
+      g.selectAll('path').style('opacity', 0.35);
+      d3.select(this).style('opacity', 1);
+
+      tooltip
+        .style('opacity', 1)
+        .html(name);
+  })
+  .on('mousemove', function (event) {
+      tooltip
+        .style('left', (event.pageX + 12) + 'px')
+        .style('top',  (event.pageY - 28) + 'px');
+  })
+  .on('mouseout', function () {
+      g.selectAll('path').style('opacity', 1);
+      d3.select(this).classed('hover', false);
+      tooltip.style('opacity', 0);
+  });
+
   }
 
   function colorize(year, rows) {

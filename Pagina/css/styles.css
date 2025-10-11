@@ -654,3 +654,12 @@ body {
     0 12px 32px var(--pinkGlow),
     0 0 0 2px rgba(255,170,210,.35) inset;
 }
+/* brillo sin escala */
+.region {
+    transition: opacity .25s ease, filter .25s ease;
+    cursor: pointer;
+}
+.region.hover {
+    filter: drop-shadow(0 0 12px var(--pinkGlow)); /* resplandor rosa */
+    /* si quieres más fuerza: drop-shadow(0 0 20px #ff62ac) */
+}
