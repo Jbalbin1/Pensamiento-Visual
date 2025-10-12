@@ -668,3 +668,8 @@ body {
     filter: drop-shadow(0 0 12px var(--pinkGlow)); /* resplandor rosa */
     /* si quieres más fuerza: drop-shadow(0 0 20px #ff62ac) */
 }
+
+/* Más alto solo el panel de burbujas */
+#Mapaburbujas + .stage { 
+  height: 700px;   /* prueba 700–800px */
+}
