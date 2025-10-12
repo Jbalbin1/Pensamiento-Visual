@@ -6,7 +6,7 @@
 }
 /* Aleja toda la página al 80 % */
 html {
-  zoom: 75%;        /* Chrome, Edge, Firefox 105+ */
+  zoom: 110%;        /* Chrome, Edge, Firefox 105+ */
 }
 
 *{ box-sizing:border-box }
