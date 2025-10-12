@@ -673,3 +673,15 @@ body {
 #Mapaburbujas + .stage { 
   height: 700px;   /* prueba 700–800px */
 }
+
+
+#BurbujasGrilla + .stage {
+  height: 760px; /* prueba 720–820px a gusto */
+}
+
+.panel h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+  font-size: 50px;
+}
