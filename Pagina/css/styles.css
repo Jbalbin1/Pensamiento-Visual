@@ -685,3 +685,34 @@ body {
   width: 100%;
   font-size: 50px;
 }
+
+
+/* ===== Modo comparar (2 mapas) ===== */
+.stage-compare{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+  height: 90vh;               /* igual que el primer panel si lo usas alto */
+  padding: 8px;
+}
+.compare-pane{
+  position:relative;
+  background: transparent;
+}
+.map-subtitle{
+  position:absolute;
+  top:8px; left:10px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:14px;
+  background:#0f1a3a;
+  color:#e5ebff;
+  border:1px solid #2e3f73;
+  pointer-events:none;
+}
+
+/* transición suave al alternar modo */
+#singleStage, #compareStage{ transition: opacity .25s ease; }
+#singleStage[hidden], #compareStage[hidden]{ opacity:0; }
+
+/* (se mantiene tu transición del mapa cuando abres detalle) */

@@ -1,12 +1,12 @@
 (async function init(){
 
-  // === 1) Datos ===
+  // === Datos ===
   const data = await fetch('data/series.json').then(r=>r.json());
-  const years = data.years || [];
+  const years = (data.years || []).slice().sort((a,b)=>a-b);
   const rowsByYear = data.rows || {};
   const delitosCat = data.delitos_estudiados || [];
 
-  // === 2) Escalas compartidas ===
+  // === Escalas compartidas ===
   const allRows = Object.values(rowsByYear).flat();
   const sats = allRows.map(d => d?.satisfaccion).filter(Number.isFinite);
   const minSat = d3.min(sats) ?? 70;
@@ -16,14 +16,20 @@
     satDomain: [minSat, maxSat],
     color: d3.scaleLinear()
       .domain([minSat, maxSat])
-      .range([d3.hcl(215, 60, 55), d3.hcl(10, 65, 55)]) // azul → rojo
+      .range([d3.hcl(215, 60, 55), d3.hcl(10, 65, 55)])
       .interpolate(d3.interpolateHcl)
       .clamp(true),
     radius: d3.scaleSqrt().domain([minSat, maxSat]).range([10, 40])
   };
 
-  // === 3) UI refs ===
-  const grid      = document.querySelector('main.grid');
+  // === UI refs ===
+  const grid        = document.querySelector('main.grid');
+  const singleStage = document.getElementById('singleStage');
+  const compareStage= document.getElementById('compareStage');
+  const labelLeft   = document.getElementById('labelLeft');
+  const labelRight  = document.getElementById('labelRight');
+
+  // Detalle (tu mismo panel)
   const detail    = document.getElementById('detailBox');
   const titleEl   = document.getElementById('detailTitle');
   const satValue  = document.getElementById('satValue');
@@ -37,75 +43,107 @@
   const vifPsico  = document.getElementById('vifPsico');
   const vifFisica = document.getElementById('vifFisica');
   const delitosUL = document.getElementById('delitosList');
+  delitosUL.innerHTML = ''; (data.delitos_estudiados||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; delitosUL.appendChild(li); });
 
-  // Renderiza lista fija de delitos
-  delitosUL.innerHTML = '';
-  delitosCat.forEach(txt=>{
-    const li = document.createElement('li'); li.textContent = txt; delitosUL.appendChild(li);
-  });
-
-  // === 4) Selector de año ===
+  // === Selector de año (+ opción comparar) ===
   const yearSel = document.getElementById('yearSel');
-  years.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; yearSel.appendChild(o); });
-  yearSel.value = years[0] || '';
+  years.forEach(y => { const o=document.createElement('option'); o.value=String(y); o.textContent=String(y); yearSel.appendChild(o); });
+  const optCompare = document.createElement('option');
+  optCompare.value = 'compare';
+  optCompare.textContent = 'Comparar 2021 vs 2023';
+  yearSel.appendChild(optCompare);
+  yearSel.value = String(years[0]);
 
-  // === 5) Inicializar vistas ===
-  if(window.Bubbles && window.MapChile){
-    Bubbles.init?.();
-    await MapChile.init?.();
+  // === Instancias de mapa ===
+  // - 1 mapa (modo normal)
+  await MapChile.init?.();
 
-    // Click en cualquier región
-    MapChile.onRegionClick?.(handleRegionClick);
-
-    function refresh(){
-      const y    = yearSel.value;
-      const rows = rowsByYear[y] || [];
-      Bubbles.update?.(y, rows);
-      MapChile.colorize?.(y, rows);
-
-      if (!detail.hasAttribute('hidden') && detail.dataset.region){
-        const name = detail.dataset.region;
-        const row  = rows.find(r => r.region === name);
-        if (row) fillDetail(name, row, computeRanks(rows));
-      }
-    }
-    yearSel.addEventListener('change', refresh);
-    refresh();
-  } else {
-    console.warn('Faltan módulos Bubbles/MapChile');
+  // - 2 mapas (modo comparar), se crean cuando se necesiten
+  let mapLeft=null, mapRight=null;
+  async function ensureCompareMaps(){
+    if (mapLeft && mapRight) return;
+    mapLeft  = createChileMap('#mapSvgL', '#mapGroupL');
+    mapRight = createChileMap('#mapSvgR', '#mapGroupR');
+    await Promise.all([mapLeft.init(), mapRight.init()]);
+    mapLeft.onRegionClick(handleRegionClick);
+    mapRight.onRegionClick(handleRegionClick);
   }
 
-  // ========= utilidades =========
+  // Click en mapa único
+  MapChile.onRegionClick?.(handleRegionClick);
+
+  // === Burbujas (tu módulo existente) ===
+  if (window.Bubbles) Bubbles.init?.();
+
+  // === Refresh según modo ===
+  function refresh(){
+    const sel = yearSel.value;
+
+    if (sel === 'compare'){
+      // mostrar 2 mapas, ocultar 1
+      singleStage.hidden = true;
+      compareStage.hidden = false;
+
+      // etiquetas (tomo el menor y el mayor del JSON)
+      const yL = years[0], yR = years[years.length-1];
+      labelLeft.textContent  = yL;
+      labelRight.textContent = yR;
+
+      ensureCompareMaps().then(()=>{
+        mapLeft.colorize(yL, rowsByYear[yL] || []);
+        mapRight.colorize(yR, rowsByYear[yR] || []);
+      });
+
+      // Las burbujas pueden seguir mostrando un año de referencia (el menor)
+      if (window.Bubbles) Bubbles.update?.(yL, rowsByYear[yL] || []);
+    } else {
+      // modo 1 mapa
+      singleStage.hidden = false;
+      compareStage.hidden = true;
+
+      const y = +sel;
+      MapChile.colorize?.(y, rowsByYear[y] || []);
+      if (window.Bubbles) Bubbles.update?.(y, rowsByYear[y] || []);
+
+      // si el detalle está abierto, refrescar KPIs
+      if (!detail.hasAttribute('hidden') && detail.dataset.region){
+        const name = detail.dataset.region;
+        const row  = (rowsByYear[y] || []).find(r=>r.region===name);
+        if (row) fillDetail(name, row, computeRanks(rowsByYear[y] || []));
+      }
+    }
+  }
+  yearSel.addEventListener('change', refresh);
+  refresh();
+
+  // ====== Detalle / rankings (se mantienen) ======
   function ordinal(n){ return `${n}.º lugar`; }
   function computeRanks(rows){
-    const bySat = [...rows].sort((a,b)=>d3.descending(a.satisfaccion, b.satisfaccion)); // mayor = mejor
-    const byDel = [...rows].sort((a,b)=>d3.ascending(a.delitos, b.delitos));             // menor = mejor
-    const byVIF = [...rows].sort((a,b)=>d3.ascending(a.vif, b.vif));                    // menor = mejor
+    const bySat = [...rows].sort((a,b)=>d3.descending(a.satisfaccion, b.satisfaccion));
+    const byDel = [...rows].sort((a,b)=>d3.ascending(a.delitos, b.delitos));
+    const byVIF = [...rows].sort((a,b)=>d3.ascending(a.vif, b.vif));
     const rank = arr => Object.fromEntries(arr.map((d,i)=>[d.region, i+1]));
     return { sat: rank(bySat), del: rank(byDel), vif: rank(byVIF), total: rows.length };
   }
-
   function fillDetail(name, row, ranks){
     detail.dataset.region = name;
     titleEl.textContent   = `Detalle — ${name}`;
-
     satValue.textContent  = `${row.satisfaccion.toFixed(1)}%`;
     delValue.textContent  = `${row.delitos.toFixed(2)}%`;
     vifValue.textContent  = `${row.vif.toFixed(2)}%`;
-
     satRank.textContent   = `${ordinal(ranks.sat[name])} en satisfacción`;
     delRank.textContent   = `${ordinal(ranks.del[name])} en delitos`;
     vifRank.textContent   = `${ordinal(ranks.vif[name])} en VIF`;
-
-    // VIF desglose
     if (Number.isFinite(row.vif_psicologica)) vifPsico.textContent  = `${row.vif_psicologica.toFixed(1)}%`;
     if (Number.isFinite(row.vif_fisica))      vifFisica.textContent = `${row.vif_fisica.toFixed(1)}%`;
   }
 
-  // ========= abrir / cerrar =========
   function handleRegionClick(name, pathEl){
-    const rows = rowsByYear[yearSel.value] || [];
-    const row  = rows.find(r => r.region === name);
+    // cuando estás en comparar, abre KPIs usando el año más cercano según selección visual:
+    const sel = yearSel.value;
+    const y   = (sel==='compare') ? years[0] : +sel;
+    const rows= rowsByYear[y] || [];
+    const row = rows.find(r=>r.region===name);
     if (!row) return;
 
     fillDetail(name, row, computeRanks(rows));
@@ -116,28 +154,21 @@
   }
 
   closeBtn?.addEventListener('click', closeDetail);
-  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeDetail(); });
+  document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') closeDetail(); });
 
   function closeDetail(){
     detail.setAttribute('hidden','');
     grid.classList.remove('detail-open');
     detailSvg.selectAll('*').remove();
-    const fly = document.getElementById('flyLayer');
-    if (fly) fly.remove();
+    const fly = document.getElementById('flyLayer'); if (fly) fly.remove();
   }
 
-  // ========= animación suave =========
+  // ====== animación de “vuelo” (igual que ya tienes) ======
   function flyRegion(sourcePathEl, targetSvgEl, row){
-    // limpia destino y overlay previo si lo hay
     d3.select(targetSvgEl).selectAll('*').remove();
     let overlay = document.getElementById('flyLayer');
-    if (!overlay){
-      overlay = document.createElement('div');
-      overlay.id = 'flyLayer';
-      document.body.appendChild(overlay);
-    } else {
-      overlay.innerHTML = '';
-    }
+    if (!overlay){ overlay = document.createElement('div'); overlay.id = 'flyLayer'; document.body.appendChild(overlay); }
+    else overlay.innerHTML = '';
 
     const dAttr  = sourcePathEl.getAttribute('d');
     const fill   = window.Scales.color(row.satisfaccion);
@@ -153,7 +184,6 @@
     flySvg.appendChild(flyPath);
     overlay.appendChild(flySvg);
 
-    // origen/destino y escala
     const sb = sourcePathEl.getBoundingClientRect();
     const tb = targetSvgEl.getBoundingClientRect();
     const scale = Math.min((tb.width*0.82)/sb.width, (tb.height*0.82)/sb.height);
@@ -168,15 +198,12 @@
     requestAnimationFrame(()=>{ flyPath.style.transform = end; });
 
     flyPath.addEventListener('transitionend', ()=>{
-      // dibuja en el panel y quita overlay
       const d = d3.select(targetSvgEl);
       const g = d.append('g');
       g.append('path').attr('d', dAttr).attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 1);
-
       const bb  = sourcePathEl.getBBox();
       const pad = Math.max(bb.width, bb.height)*0.1;
       d.attr('viewBox', `${bb.x-pad} ${bb.y-pad} ${bb.width+2*pad} ${bb.height+2*pad}`);
-
       overlay.remove();
     }, { once:true });
   }

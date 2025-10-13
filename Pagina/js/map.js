@@ -1,9 +1,8 @@
-// Módulo mínimo para mapa (colorea por satisfacción si la fila existe)
-window.MapChile = (function () {
-  const URL = 'data/chile-regions.json'; // GADM gadm41_CHL_1.json guardado local
-  let svg, g, path;
+// ====== Fábrica de mapas de Chile (reutilizable) ======
+(function(){
+  const URL = 'data/chile-regions.json';
 
-  // Alias para que coincida con tus etiquetas de datos
+  // Alias para empatar nombres del GeoJSON con tu JSON de series
   const alias = {
     "SantiagoMetropolitan": "Metropolitana",
     "LibertadorGeneralBernardoO'Hi": "O'Higgins",
@@ -15,166 +14,143 @@ window.MapChile = (function () {
     "LosRíos": "Los Ríos",
     "LosLagos": "Los Lagos",
     "MagallanesyAntárticaChilena": "Magallanes"
-    // el resto ya coincide
   };
-  const regionName = (f) => alias[f.properties.NAME_1] || f.properties.NAME_1;
+  const nameFor = (f) => alias[f.properties.NAME_1] || f.properties.NAME_1;
 
-  async function init() {
-    svg = d3.select('#mapSvg');
-    g = svg.select('#mapGroup');
+  // ---- Crea una instancia apuntando a un SVG concreto ----
+  function createInstance(svgSel, groupSel){
+    let svg, g, path, _inited=false;
 
-    const projection = d3.geoMercator().center([-72.5, -39]).scale(1200).translate([350, 500]);
-    path = d3.geoPath(projection);
+    async function init(){
+      if (_inited) return;
+      svg = d3.select(svgSel);
+      g   = svg.select(groupSel);
 
-    try {
-      const geo = await fetch(URL).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+      const projection = d3.geoMercator()
+        .center([-72.5, -39])
+        .scale(1200)
+        .translate([350, 500]);
+      path = d3.geoPath(projection);
 
-      g.selectAll('path')
-        .data(geo.features, (f) => regionName(f))
-        .join('path')
-        .attr('class', 'region region-grow')
-        .attr('d', path)
-        .attr('fill', '#263363'); // base antes de colorize()
-
-      // --- Leyenda de color (barra horizontal arriba del mapa) ---
-      drawLegend();
-
-    } catch (err) {
-      console.error('Error cargando GeoJSON:', err);
-      g.append('text').attr('x', 20).attr('y', 30).attr('fill', '#f66')
-        .text('No se pudo cargar el mapa (revisa data/chile-regions.json)');
-    }
-    
-    // mismos tooltip que antes
-const tooltip = d3.select('body')
-  .append('div')
-  .attr('class', 'map-tooltip')
-  .style('position', 'absolute')
-  .style('pointer-events', 'none')
-  .style('opacity', 0)
-  .style('background', 'rgba(17, 22, 42, .95)')
-  .style('color', '#eef3ff')
-  .style('padding', '8px 14px')
-  .style('border-radius', '10px')
-  .style('font-size', '15px')
-  .style('border', '1px solid #3b4a7a')
-  .style('box-shadow', '0 6px 18px rgba(0,0,0,.35)')
-  .style('transition', 'opacity .2s ease');
-
-g.selectAll('path')
-  .on('mouseover', function (event, f) {
-      const name = regionName(f);
-
-      // solo iluminamos; sin scale, sin transform
-      d3.select(this).classed('hover', true);
-
-      // atenuar el resto
-      g.selectAll('path').style('opacity', 0.35);
-      d3.select(this).style('opacity', 1);
-
-      tooltip
-        .style('opacity', 1)
-        .html(name);
-  })
-  .on('mousemove', function (event) {
-      tooltip
-        .style('left', (event.pageX + 12) + 'px')
-        .style('top',  (event.pageY - 28) + 'px');
-  })
-  .on('mouseout', function () {
-      g.selectAll('path').style('opacity', 1);
-      d3.select(this).classed('hover', false);
-      tooltip.style('opacity', 0);
-  });
-
-  }
-
-  function colorize(year, rows) {
-    const byName = Object.fromEntries(rows.map((d) => [d.region, d]));
-    const color = window.Scales?.color || ((x)=>'#888');
-    const missing = [];
-
-    g.selectAll('path')
-      .transition().duration(400)
-      .attr('fill', (f) => {
-        const name = regionName(f);
-        const row = byName[name];
-        if (!row || !Number.isFinite(row.satisfaccion)) {
-          missing.push(name);
-          return '#3a4366'; // gris azulado para "sin dato / sin match"
-        }
-        return color(row.satisfaccion); // misma escala que burbujas
+      const geo = await fetch(URL).then(r=>{
+        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
       });
 
-    if (missing.length) {
-      const uniq = [...new Set(missing)].sort();
-      console.warn('Regiones sin dato / nombre no coincide:', uniq);
-    }
-  }
+      g.selectAll('path')
+        .data(geo.features, f=>nameFor(f))
+        .join('path')
+        .attr('class','region')
+        .attr('d', path)
+        .attr('fill', '#263363');
 
-  // (Opcional) expón click de región para abrir popup
-  function onRegionClick(handler) {
-    g.selectAll('path').on('click', function (ev, f) {
-      handler(regionName(f), this);
-    });
-  }
-  return { init, colorize, onRegionClick };
-
-  // ---------- Leyenda ----------
-  function drawLegend(){
-    // Limpia si existe
-    svg.select('#legend').remove();
-
-    const domain = window.Scales?.satDomain || [70, 85];
-    const [minSat, maxSat] = domain;
-    const legendW = 300, legendH = 12;
-    const margin = {x: 24, y: 16};
-
-    const legend = svg.append('g').attr('id','legend')
-      .attr('transform', `translate(${margin.x},${margin.y})`);
-
-    // Gradiente
-    const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
-    const grad = defs.append('linearGradient')
-      .attr('id','legendGrad')
-      .attr('x1','0%').attr('y1','0%')
-      .attr('x2','100%').attr('y2','0%');
-
-    // Muestreamos la escala para que el degradado sea suave
-    const color = window.Scales.color;
-    const N = 40;
-    for (let i=0; i<=N; i++){
-      const t = i / N;
-      grad.append('stop')
-        .attr('offset', `${t*100}%`)
-        .attr('stop-color', color(minSat + t*(maxSat-minSat)));
+      drawLegend();     // leyenda propia por SVG
+      wireHover();      // tooltip propio
+      _inited = true;
     }
 
-    // Barra
-    legend.append('rect')
-      .attr('width', legendW).attr('height', legendH)
-      .attr('rx', 4).attr('ry', 4)
-      .attr('fill', 'url(#legendGrad)')
-      .attr('stroke', '#233055').attr('stroke-width', 1);
+    function colorize(year, rows){
+      const byName = Object.fromEntries(rows.map(d=>[d.region, d]));
+      const color  = window.Scales?.color || (()=>'#888');
 
-    // Ticks y etiquetas
-    const scale = d3.scaleLinear().domain(domain).range([0, legendW]);
-    const axis = d3.axisBottom(scale)
-      .ticks(4)
-      .tickFormat(d => d.toFixed(1) + '%');
+      g.selectAll('path')
+        .transition().duration(400)
+        .attr('fill', f=>{
+          const row = byName[nameFor(f)];
+          return (row && Number.isFinite(row.satisfaccion))
+            ? color(row.satisfaccion)
+            : '#3a4366';
+        });
+    }
 
-    legend.append('g')
-      .attr('transform', `translate(0, ${legendH})`)
-      .call(axis)
-      .selectAll('text').attr('fill', '#cbd6ff');
+    function onRegionClick(handler){
+      g.selectAll('path').on('click', function(ev, f){
+        handler(nameFor(f), this);
+      });
+    }
 
-    // Título
-    legend.append('text')
-      .attr('x', 0).attr('y', -6)
-      .attr('fill', '#cbd6ff')
-      .attr('font-size', 12)
-      .text('Satisfacción de la vida (%)');
+    // ----- Leyenda acoplada a este SVG -----
+    function drawLegend(){
+      svg.select('#legend').remove();
+      const domain = window.Scales?.satDomain || [70,85];
+      const [minSat, maxSat] = domain;
+      const legendW = 300, legendH = 12;
+      const margin = {x: 24, y: 16};
+
+      const legend = svg.append('g').attr('id','legend')
+        .attr('transform', `translate(${margin.x},${margin.y})`);
+
+      const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
+      const grad = defs.append('linearGradient')
+        .attr('id', `legendGrad-${svgSel}`)
+        .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','0%');
+
+      const color = window.Scales.color;
+      const N = 40;
+      for (let i=0;i<=N;i++){
+        const t=i/N;
+        grad.append('stop')
+          .attr('offset', `${t*100}%`)
+          .attr('stop-color', color(minSat + t*(maxSat-minSat)));
+      }
+
+      legend.append('rect')
+        .attr('width', legendW).attr('height', legendH)
+        .attr('rx',4).attr('ry',4)
+        .attr('fill', `url(#legendGrad-${svgSel})`)
+        .attr('stroke','#233055').attr('stroke-width',1);
+
+      const scale = d3.scaleLinear().domain(domain).range([0, legendW]);
+      const axis  = d3.axisBottom(scale).ticks(4).tickFormat(d=>d.toFixed(1)+'%');
+      legend.append('g')
+        .attr('transform', `translate(0, ${legendH})`)
+        .call(axis)
+        .selectAll('text').attr('fill','#cbd6ff');
+
+      legend.append('text')
+        .attr('x',0).attr('y',-6).attr('fill','#cbd6ff')
+        .attr('font-size',12).text('Satisfacción de la vida (%)');
+    }
+
+    // ----- Tooltip / hover por instancia -----
+    function wireHover(){
+      const tooltip = d3.select('body').append('div')
+        .attr('class','map-tooltip')
+        .style('position','absolute')
+        .style('pointer-events','none')
+        .style('opacity',0)
+        .style('background','rgba(17,22,42,.95)')
+        .style('color','#eef3ff')
+        .style('padding','8px 14px')
+        .style('border-radius','10px')
+        .style('font-size','15px')
+        .style('border','1px solid #3b4a7a')
+        .style('box-shadow','0 6px 18px rgba(0,0,0,.35)')
+        .style('transition','opacity .2s ease');
+
+      g.selectAll('path')
+        .on('mouseover', function (event, f) {
+          g.selectAll('path').style('opacity', .35);
+          d3.select(this).style('opacity', 1);
+          tooltip.style('opacity',1).html(nameFor(f));
+        })
+        .on('mousemove', function (event) {
+          tooltip.style('left', (event.pageX+12)+'px')
+                 .style('top',  (event.pageY-28)+'px');
+        })
+        .on('mouseout', function(){
+          g.selectAll('path').style('opacity',1);
+          tooltip.style('opacity',0);
+        });
+    }
+
+    return { init, colorize, onRegionClick };
   }
 
-  return { init, colorize, onRegionClick };
+  // Exporta una instancia por defecto (modo 1 mapa)
+  window.MapChile = createInstance('#mapSvg', '#mapGroup');
+
+  // Exporta la fábrica para crear otras (modo comparar)
+  window.createChileMap = createInstance;
+
 })();

@@ -104,10 +104,28 @@
       <div id="MapaRegion">
         <h2>Mapa por satisfacción</h2>
       </div>
-      <div class="stage">
+
+      <!-- MODO ÚNICO (1 mapa) -->
+      <div class="stage" id="singleStage">
         <svg id="mapSvg" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
           <g id="mapGroup"></g>
         </svg>
+      </div>
+
+      <!-- MODO COMPARAR (2 mapas) -->
+      <div class="stage stage-compare" id="compareStage" hidden>
+        <div class="compare-pane">
+          <div class="map-subtitle" id="labelLeft">2021</div>
+          <svg id="mapSvgL" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
+            <g id="mapGroupL"></g>
+          </svg>
+        </div>
+        <div class="compare-pane">
+          <div class="map-subtitle" id="labelRight">2023</div>
+          <svg id="mapSvgR" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
+            <g id="mapGroupR"></g>
+          </svg>
+        </div>
       </div>
     </section>
 
