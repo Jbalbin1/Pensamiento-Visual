@@ -129,15 +129,6 @@
       </div>
     </section>
 
-    <section class="panel">
-      <div id="Mapaburbujas">
-        <h2>Delitos vs VIF (burbujas)</h2>
-      </div>
-      <div class="stage">
-        <svg id="bubbleSvg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
-      </div>
-    </section>
-
     <section class="panel panel-detail">
       <div id="detailBox" class="detail-box" hidden>
         <h1 id="detailTitle">Detalle — Región</h1>
@@ -191,54 +182,54 @@
       </div>
     </section>
 
-  </main>
+  <!-- … todo lo que tenías antes del cierre de </main> … -->
 
-  <section class="panel">
+  </main>   <!-- ☝️ cierra el grid que ya tenías -->
+
+  <!-- Grilla serpenteante ÚNICA -->
+  <section class="panel panel-bubbles">
     <div id="BurbujasGrilla">
       <h1>Burbujas por región (grilla)</h1>
     </div>
     <div class="stage">
-      <svg id="gridSvg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="gridSvg" viewBox="0 0 3800 2000" preserveAspectRatio="xMinYMin slice"></svg>
     </div>
   </section>
 
-<section id="motivacion" class="section motivation">
-  <div class="container">
-    <h2>¿Qué puedo hacer como individuo?</h2>
-
-    <div class="tips tips-big">
-      <div class="tip">
-        <h3>1) Habla del tema</h3>
-        <p>Conversar de VIF y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
+  <!-- Motivación (igual que tenías) -->
+  <section id="motivacion" class="section motivation">
+    <div class="container">
+      <h2>¿Qué puedo hacer como individuo?</h2>
+      <div class="tips tips-big">
+        <div class="tip">
+          <h3>1) Habla del tema</h3>
+          <p>Conversar de VIF y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
+        </div>
+        <div class="tip">
+          <h3>2) Arma red</h3>
+          <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>3) Participa</h3>
+          <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>4) Respeto siempre</h3>
+          <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>5) Denuncia responsable</h3>
+          <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
+        </div>
       </div>
-      <div class="tip">
-        <h3>2) Arma red</h3>
-        <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>3) Participa</h3>
-        <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>4) Respeto siempre</h3>
-        <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>5) Denuncia responsable</h3>
-        <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
+      <div class="cta-row">
+        <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
       </div>
     </div>
+  </section>
 
-    <div class="cta-row">
-      <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
-    </div>
-  </div>
-</section>
-
-  <script src="js/bubbles.js"></script>
   <script src="js/map.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/burbujas.js?v=2"></script>
-
+<script src="js/burbujas.js?v=4"></script>
 </body>
 </html>

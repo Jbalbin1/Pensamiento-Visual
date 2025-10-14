@@ -676,7 +676,7 @@ body {
 
 
 #BurbujasGrilla + .stage {
-  height: 760px; /* prueba 720–820px a gusto */
+  height: 200px; /* prueba 720–820px a gusto */
 }
 
 .panel h1 {
@@ -716,3 +716,39 @@ body {
 #singleStage[hidden], #compareStage[hidden]{ opacity:0; }
 
 /* (se mantiene tu transición del mapa cuando abres detalle) */
+
+/* --- Burbujas: que no se recorten y sean altas --- */
+.panel-bubbles {
+  overflow: visible !important;
+}
+
+/* Altura grande para ambas stages de burbujas */
+.panel-bubbles > .stage {
+  width: 100%;
+  height: auto !important;
+  min-height: 500px; /* ✅ puedes subirlo si quieres más espacio */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gridSvg {
+  width: 100%;
+  height: auto;
+}
+
+/* Separación extra bajo el panel de la grilla para no “pisar” motivación */
+.panel-bubbles {
+  margin-bottom: 24px;
+}
+
+.panel-bubbles > .stage {
+  height: auto !important; /* ✅ fuerza altura automática */
+  min-height: 1000px; /* ✅ opcional: altura mínima para que no quede muy chico */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
