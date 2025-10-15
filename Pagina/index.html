@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -58,34 +59,40 @@
       });
   </script>
 
-<section id="inicio" class="section hero">
-  <div class="container">
+<section id="inicio" class="section hero hero-v3">
+  <div class="hero-bg">
+    <img src="img/calle-nocturna-chile.jpg" alt="Calle chilena de noche, una ventana prendida">
+    <div class="hero-overlay"></div>
+  </div>
 
-    <h1>¿Qué buscamos?</h1>
-    <p class="lead">
-      Que al explorar estos datos <strong>te hagas preguntas</strong>, 
-      <strong>converses</strong> y <strong>mires tu entorno con otros ojos</strong>.
-      Queremos una ciudadanía joven más <em>crítica, empática</em> y con ganas de participar.
-    </p>
-
-    <div class="callout">
-      <p><strong>En simple:</strong> no es solo “informar”, es <strong>mover</strong> a la reflexión y al compromiso.</p>
+  <div class="hero-content">
+    <div class="hero-layer layer1">
+      <h1>
+        Explora<br>
+        Cuestionate<br>
+        Conversa<br>
+        Mirá tu entorno<br>
+        <span class="highlight">Informarte es ayudar.</span>
+      </h1>
     </div>
 
-    <h2>¿Por qué?</h2>
-    <ul class="hero-list">
-      <li> Muchos adolescentes y jóvenes perciben los problemas sociales como algo <strong>ajeno o inevitable</strong>, 
-        cuando en realidad influyen directamente en su calidad de vida y en la de sus comunidades.
-      <li>A través de esta visualización buscamos traducir datos complejos en <strong>información clara y significativa</strong>, 
-        que les permita <strong>entender, cuestionar y conversar</strong> sobre los factores que afectan el bienestar colectivo, 
-        fomentando así una ciudadanía más consciente y empática.</li>
-    </ul>
+    <div class="hero-layer layer2">
+      <p>Muchos percibimos los problemas sociales como algo ajeno o inevitable,<br>
+      pero el cambio <strong>está en cada uno</strong>.</p>
+    </div>
 
-    <h2>¿Qué es la satisfacción de la vida?</h2>
-    <p>
-      La satisfacción de la vida es una medida subjetiva de cómo la persona valora su 
-      existencia en el momento, usualmente tomando en consideración factores de <strong>salud, seguridad, felicidad, entre otros.</strong>
-    </p>
+    <div class="hero-layer layer3">
+      <p>Queremos que entiendas, te cuestiones y converses
+      para así tener una ciudadanía <strong>más consciente y empática</strong>.</p>
+    </div>
+
+    <div class="hero-layer layer4">
+      <h2>
+        <strong>¿Qué es la satisfacción de la vida?</strong><br> </h2>
+      <p>Es cómo <strong>cada uno</strong> valora su existencia <strong>en el momento</strong>,
+      mirando la <br> 
+      <strong>salud, seguridad, felicidad</strong>.</p>
+    </div>
   </div>
 </section>
 
@@ -126,6 +133,15 @@
             <g id="mapGroupR"></g>
           </svg>
         </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div id="Mapaburbujas">
+        <h2>Delitos vs VIF (burbujas)</h2>
+      </div>
+      <div class="stage">
+        <svg id="bubbleSvg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
     </section>
 
@@ -182,54 +198,54 @@
       </div>
     </section>
 
-  <!-- … todo lo que tenías antes del cierre de </main> … -->
+  </main>
 
-  </main>   <!-- ☝️ cierra el grid que ya tenías -->
-
-  <!-- Grilla serpenteante ÚNICA -->
-  <section class="panel panel-bubbles">
+  <section class="panel">
     <div id="BurbujasGrilla">
       <h1>Burbujas por región (grilla)</h1>
     </div>
     <div class="stage">
-      <svg id="gridSvg" viewBox="0 0 3800 2000" preserveAspectRatio="xMinYMin slice"></svg>
+      <svg id="gridSvg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </section>
 
-  <!-- Motivación (igual que tenías) -->
-  <section id="motivacion" class="section motivation">
-    <div class="container">
-      <h2>¿Qué puedo hacer como individuo?</h2>
-      <div class="tips tips-big">
-        <div class="tip">
-          <h3>1) Habla del tema</h3>
-          <p>Conversar de VIF y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
-        </div>
-        <div class="tip">
-          <h3>2) Arma red</h3>
-          <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
-        </div>
-        <div class="tip">
-          <h3>3) Participa</h3>
-          <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
-        </div>
-        <div class="tip">
-          <h3>4) Respeto siempre</h3>
-          <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
-        </div>
-        <div class="tip">
-          <h3>5) Denuncia responsable</h3>
-          <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
-        </div>
+<section id="motivacion" class="section motivation">
+  <div class="container">
+    <h2>¿Qué puedo hacer como individuo?</h2>
+
+    <div class="tips tips-big">
+      <div class="tip">
+        <h3>1) Habla del tema</h3>
+        <p>Conversar de VIF y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
       </div>
-      <div class="cta-row">
-        <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
+      <div class="tip">
+        <h3>2) Arma red</h3>
+        <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>3) Participa</h3>
+        <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>4) Respeto siempre</h3>
+        <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
+      </div>
+      <div class="tip">
+        <h3>5) Denuncia responsable</h3>
+        <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
       </div>
     </div>
-  </section>
 
+    <div class="cta-row">
+      <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
+    </div>
+  </div>
+</section>
+
+  <script src="js/bubbles.js"></script>
   <script src="js/map.js"></script>
   <script src="js/main.js"></script>
-<script src="js/burbujas.js?v=4"></script>
+  <script src="js/burbujas.js"></script> 
+
 </body>
 </html>
