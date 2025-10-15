@@ -5,41 +5,57 @@
   const svg = d3.select('#gridSvg');
   if (svg.empty()) return;
 
-  // === NUEVO: recordamos el año actual para poder redibujar al cambiar el ancho
   let currentYear = null;
-
   const fmtPct = x => Number.isFinite(x) ? Math.round(x * 100) + '%' : '—';
 
+  // Escala de color EXCLUSIVA para burbujas (no toca la del mapa)
   async function ensureScales(data) {
-    if (!window.Scales) window.Scales = {};
-    if (!window.Scales.satDomain || !window.Scales.color) {
-      const all = Object.values(data.rows).flat();
-      const sats = all.map(d => d.satisfaccion).filter(Number.isFinite);
-      const minSat = Math.min(...sats), maxSat = Math.max(...sats);
-      const domain = [Math.floor(minSat), Math.ceil(maxSat)];
-      const color = d3.scaleLinear()
-        .domain([domain[0], (domain[0] + domain[1]) / 2, domain[1]])
-        .range(['#263363', '#3b56a8', '#8fb4ff']);
-      window.Scales = { satDomain: domain, color };
-    }
+    if (!window.ScalesBurbujas) window.ScalesBurbujas = {};
+
+    // TOMA un rosado fuerte desde tu CSS (–pink2). Fallback muy vívido.
+    const css     = getComputedStyle(document.documentElement);
+    const cPink   = (css.getPropertyValue('--pink2') || '#ff3f8e').trim(); // ROSADO FUERTE
+    const cViolet = '#8a6bff';  // violeta intenso (bisagra)
+    const cCyan   = '#21c4ff';  // celeste/cián bien saturado
+
+    // Dominio real según datos
+    const all  = Object.values(data.rows).flat();
+    const sats = all.map(d => d.satisfaccion).filter(Number.isFinite);
+    const minSat = Math.min(...sats), maxSat = Math.max(...sats);
+    const domain = [Math.floor(minSat), Math.ceil(maxSat)];
+    window.ScalesBurbujas.satDomain = domain;
+
+    // Escala INVERTIDA y con interpolación gamma para colores más “potentes”
+    window.ScalesBurbujas.color = d3.scaleLinear()
+      .domain([domain[0], (domain[0] + domain[1]) / 2, domain[1]]) // bajo→medio→alto
+      .range([cPink, cViolet, cCyan])
+      .interpolate(d3.interpolateRgb.gamma(2.2)); // aumenta saturación/percepción
   }
+
 
   function drawColorLegend(svg, W, H) {
     svg.select('#gridLegendColor').remove();
-    const color = window.Scales?.color;
-    const domain = window.Scales?.satDomain || [70, 85];
+    const color  = window.ScalesBurbujas?.color;
+    const domain = window.ScalesBurbujas?.satDomain || [70, 85];
     if (!color) return;
 
     const legendW = 560, legendH = 26, x = 70, y = H - 70;
-    const legend = svg.append('g').attr('id', 'gridLegendColor').attr('transform', `translate(${x},${y})`);
+    const legend = svg.append('g')
+      .attr('id', 'gridLegendColor')
+      .attr('transform', `translate(${x},${y})`);
 
     const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
-    const grad = defs.append('linearGradient').attr('id', 'gridLegendGrad').attr('x1', '0%').attr('x2', '100%');
+    const grad = defs.append('linearGradient')
+      .attr('id', 'gridLegendGrad')
+      .attr('x1', '0%').attr('x2', '100%');
+
     const [minSat, maxSat] = domain;
     const N = 60;
     for (let i = 0; i <= N; i++) {
       const t = i / N;
-      grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', color(minSat + t * (maxSat - minSat)));
+      grad.append('stop')
+        .attr('offset', `${t * 100}%`)
+        .attr('stop-color', color(minSat + t * (maxSat - minSat)));
     }
 
     legend.append('rect')
@@ -49,10 +65,13 @@
 
     const scale = d3.scaleLinear().domain(domain).range([0, legendW]);
     const axis = d3.axisBottom(scale).ticks(6).tickFormat(d => d.toFixed(1) + '%');
-    legend.append('g').attr('transform', `translate(0,${legendH})`).call(axis)
+    legend.append('g')
+      .attr('transform', `translate(0,${legendH})`)
+      .call(axis)
       .selectAll('text').attr('fill', '#cbd6ff').attr('font-size', 18);
 
-    legend.append('text').attr('x', 0).attr('y', -14)
+    legend.append('text')
+      .attr('x', 0).attr('y', -14)
       .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
       .text('Satisfacción de la vida (%)');
 
@@ -62,13 +81,18 @@
   function drawSizeLegend(svg, W, H, rMin, rMax, vMin, vMax, xStartRightOfColor) {
     svg.select('#gridLegendSize').remove();
     const x = xStartRightOfColor + 60, y = H - 70;
-    const g = svg.append('g').attr('id', 'gridLegendSize').attr('transform', `translate(${x},${y})`);
+    const g = svg.append('g')
+      .attr('id', 'gridLegendSize')
+      .attr('transform', `translate(${x},${y})`);
+
     g.append('text').attr('x', 0).attr('y', -14)
       .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
       .text('Tamaño = VIF');
 
     const cy = 12 + rMax, gap = 40 + rMax;
-    const midColor = window.Scales?.color ? window.Scales.color((window.Scales.satDomain[0] + window.Scales.satDomain[1]) / 2) : '#3a4366';
+    const midColor = window.ScalesBurbujas?.color
+      ? window.ScalesBurbujas.color((window.ScalesBurbujas.satDomain[0] + window.ScalesBurbujas.satDomain[1]) / 2)
+      : '#3a4366';
 
     g.append('circle').attr('cx', 0).attr('cy', cy).attr('r', rMin)
       .attr('fill', midColor).attr('stroke', '#233055').attr('stroke-width', 2);
@@ -97,7 +121,6 @@
     const rowsCount = 2;
     const cols = Math.ceil(data.length / rowsCount);
 
-    // === CAMBIO: medición de ancho robusta (evita anchos viejos)
     const stageEl = document.querySelector('.panel-bubbles .stage');
     const stageWidth = stageEl
       ? stageEl.getBoundingClientRect().width
@@ -119,8 +142,6 @@
     }
 
     const realW = padX * 2 + (cols - 1) * (cellW + gapX) + cellW;
-
-    // leyendas al fondo
     const legendH = 90;
     const realH = padY*2 + (rowsCount-1)*(cellH+gapY) + cellH + legendH;
 
@@ -137,7 +158,7 @@
     drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, xEnd);
 
     const gRoot = svg.append('g').attr('class', 'grid-root');
-    const gCells = gRoot.selectAll('g.cell')
+    gRoot.selectAll('g.cell')
       .data(data, d => d.region)
       .join(enter => {
         const g = enter.append('g')
@@ -146,7 +167,7 @@
 
         g.append('circle')
           .attr('r', 0)
-          .attr('fill', d => window.Scales.color(d.satisfaccion))
+          .attr('fill', d => window.ScalesBurbujas.color(d.satisfaccion))
           .attr('stroke', '#233055')
           .attr('stroke-width', 1.5)
           .transition().duration(600)
@@ -184,6 +205,7 @@
     try {
       const data = await getData();
       await ensureScales(data);
+
       const sel = document.getElementById('yearSel');
       if (sel && sel.options.length === 0 && Array.isArray(data.years)) {
         data.years.forEach(y => {
@@ -194,20 +216,17 @@
         });
       }
       const year = sel ? Number(sel.value) || data.years[0] : data.years[0];
-
-      // === NUEVO: guardar año actual
       currentYear = year;
 
       renderGrid(year, data.rows[String(year)] || []);
 
       if (sel) {
         sel.addEventListener('change', () => {
-          currentYear = Number(sel.value); // === NUEVO: actualiza currentYear
+          currentYear = Number(sel.value);
           renderGrid(currentYear, data.rows[sel.value] || []);
         });
       }
 
-      // === NUEVO: redibuja cuando cambie el ancho del contenedor de burbujas
       const stageEl = document.querySelector('.panel-bubbles .stage');
       if (stageEl) {
         const ro = new ResizeObserver(() => {
@@ -218,7 +237,6 @@
         ro.observe(stageEl);
       }
 
-      // === NUEVO: redibuja también al redimensionar la ventana
       window.addEventListener('resize', () => {
         if (currentYear != null) {
           renderGrid(currentYear, data.rows[String(currentYear)] || []);

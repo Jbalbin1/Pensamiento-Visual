@@ -151,38 +151,67 @@ body{ padding-top:80px; } /* compensa topbar */
 .panel:first-of-type{ margin-bottom:50px; }
 
 .detail-box{
-  background:#243566; border:1px solid #2e3f73; border-radius:12px;
-  padding:16px 18px; margin:8px 14px 16px; display:none; min-height:220px; text-align: center;
+  background:#243566; 
+  border:1px solid #2e3f73; 
+  border-radius:12px;
+  padding:16px 18px; 
+  margin:8px 14px 16px; 
+  display:none; 
+  min-height:220px; 
+  text-align: center;
 }
 .detail-box:not([hidden]){ display:block; }
+
 
 /* — Fix CRÍTICO: mini mapa visible — */
 #detailRegionSvg {
   display: block;
-  margin: 20px auto 24px;        /* centrado y con aire arriba/abajo */
+  margin: 28px auto 28px;   /* centrado con aire */
   width: 100%;
   height: auto;
-  max-width: 500px;              /* agranda la región dentro del recuadro */
-  max-height: 320px;
-        /* mantiene proporción similar a Chile */
+  max-width: 560px;         /* << más grande */
+  max-height: 420px;        /* << más alto */
   background: transparent;
+  /* Nota: NO forzamos aspect-ratio para no distorsionar el SVG */
 }
 
 /* Tipos del cuadro y botón */
 .panel h1{ text-align:center; margin:14px 0 10px; font-size:32px; width:100%; }
 .detail-box h3{ margin:0 0 8px; color:#e5ebff; font-size:22px; }
 .detail-box p{ margin:0 0 14px; color:#cbd6ff; }
-.close-detail{
-  background:#1b2547; color:var(--ink); border:1px solid #3b4a7a; border-radius:10px;
-  padding:10px 18px; font-size:16px; cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+.close-detail {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  background: #1b2547;
+  color: var(--ink);
+  border: 1px solid #3b4a7a;
+  border-radius: 10px;
+
+  padding: 10px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  transition: background .2s, transform .2s;
 }
-.close-detail::before{ content:"←"; font-size:18px; }
-.close-detail:hover{ background:#2a3a6f; }
+.close-detail::before {
+  content: "←";
+  font-size: 18px;
+}
+
+.close-detail:hover {
+  background: #2a3a6f;
+  transform: scale(1.05);
+}
 
 /* KPIs */
 .kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:14px 0 10px; }
 .kpi{
-  background:#1e2b54; border:1px solid #2b3a6e; border-radius:14px; padding:14px 16px; text-align:center;
+  background:#1e2b54; border:1px solid #2b3a6e; border-radius:20px; padding:14px 20px; text-align:center;
 }
 .kpi .icon{ font-size:46px; line-height:1; opacity:.95; margin-bottom:4px; }
 .kpi .value{ font-size:54px; font-weight:800; letter-spacing:.3px; line-height:1.05; }
@@ -350,21 +379,12 @@ body{ padding-top:80px; } /* compensa topbar */
   margin-top: 60px;
 }
 
-/* =========================================================
-   EXTRA: mantenemos la región del pop-up grande y centrada
-   (del fix anterior, lo dejo aquí para que no se pierda)
-   ========================================================= */
-#detailRegionSvg {
-  display: block;
-  margin: 20px auto 24px;
-  width: 100%;
-  height: auto;
-  max-width: 420px;
-  max-height: 320px;
-  aspect-ratio: 1 / 0.65;
-}
 
-.detail-box { text-align: center; }
+
+.detail-box { 
+  text-align: center; 
+  position: relative;
+}
 
 
 

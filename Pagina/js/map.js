@@ -51,17 +51,22 @@
 
     function colorize(year, rows){
       const byName = Object.fromEntries(rows.map(d=>[d.region, d]));
-      const color  = window.Scales?.color || (()=>'#888');
+      const domain = window.Scales?.satDomain || [70,85];
+      const [minSat, maxSat] = domain;
+
+      // Función de color invertida: f(v) = color(min + max - v)
+      const baseColor = window.Scales?.color || (()=>'#888');
+      const paint = v => baseColor(minSat + maxSat - v);
 
       g.selectAll('path')
         .transition().duration(400)
         .attr('fill', f=>{
           const row = byName[nameFor(f)];
           return (row && Number.isFinite(row.satisfaccion))
-            ? color(row.satisfaccion)
+            ? paint(row.satisfaccion)
             : '#3a4366';
         });
-    }
+    } 
 
     function onRegionClick(handler){
       g.selectAll('path').on('click', function(ev, f){
@@ -81,23 +86,27 @@
         .attr('transform', `translate(${margin.x},${margin.y})`);
 
       const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
+      const gradId = `legendGrad-${svgSel}`;
+      defs.select(`#${gradId}`).remove();              // por si se re-dibuja
       const grad = defs.append('linearGradient')
-        .attr('id', `legendGrad-${svgSel}`)
+        .attr('id', gradId)
         .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','0%');
 
-      const color = window.Scales.color;
+      const baseColor = window.Scales.color;
       const N = 40;
       for (let i=0;i<=N;i++){
-        const t=i/N;
+        const t = i / N;
+        const val = minSat + t * (maxSat - minSat);        // valor “normal”
+        const flipped = minSat + maxSat - val;             // valor espejado
         grad.append('stop')
           .attr('offset', `${t*100}%`)
-          .attr('stop-color', color(minSat + t*(maxSat-minSat)));
+          .attr('stop-color', baseColor(flipped));         // ← clave: usamos flipped
       }
 
       legend.append('rect')
         .attr('width', legendW).attr('height', legendH)
         .attr('rx',4).attr('ry',4)
-        .attr('fill', `url(#legendGrad-${svgSel})`)
+        .attr('fill', `url(#${gradId})`)
         .attr('stroke','#233055').attr('stroke-width',1);
 
       const scale = d3.scaleLinear().domain(domain).range([0, legendW]);
@@ -111,6 +120,7 @@
         .attr('x',0).attr('y',-6).attr('fill','#cbd6ff')
         .attr('font-size',12).text('Satisfacción de la vida (%)');
     }
+
 
     // ----- Tooltip / hover por instancia -----
     function wireHover(){
@@ -156,28 +166,3 @@
 
 })();
 
-
-  // === CLICK EN REGIÓN ===
-  d3.selectAll(".region").on("click", function(event, d) {
-    const region = d3.select(this);
-    const regionName = region.attr("data-region") || d.properties?.region || "Región";
-
-    // Abre el panel de detalle
-    const grid = document.querySelector(".grid");
-    grid.classList.add("detail-open");
-
-    // Actualiza título
-    document.getElementById("detailTitle").textContent = `Detalle — ${regionName}`;
-
-    // Limpia y clona la región seleccionada dentro del SVG pequeño
-    const detailSvg = document.getElementById("detailRegionSvg");
-    if (detailSvg) {
-      detailSvg.innerHTML = "";
-      const clone = region.node().cloneNode(true);
-      clone.removeAttribute("class");
-      clone.setAttribute("fill", "#ff5ea8");
-      clone.setAttribute("stroke", "#fff");
-      clone.setAttribute("stroke-width", "2");
-      detailSvg.appendChild(clone);
-    }
-  });
