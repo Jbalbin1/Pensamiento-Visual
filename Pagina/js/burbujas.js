@@ -5,6 +5,9 @@
   const svg = d3.select('#gridSvg');
   if (svg.empty()) return;
 
+  // === NUEVO: recordamos el año actual para poder redibujar al cambiar el ancho
+  let currentYear = null;
+
   const fmtPct = x => Number.isFinite(x) ? Math.round(x * 100) + '%' : '—';
 
   async function ensureScales(data) {
@@ -94,7 +97,12 @@
     const rowsCount = 2;
     const cols = Math.ceil(data.length / rowsCount);
 
-    const stageWidth = document.querySelector('.panel-bubbles .stage').clientWidth;
+    // === CAMBIO: medición de ancho robusta (evita anchos viejos)
+    const stageEl = document.querySelector('.panel-bubbles .stage');
+    const stageWidth = stageEl
+      ? stageEl.getBoundingClientRect().width
+      : (svg.node().parentElement?.getBoundingClientRect?.().width || 1200);
+
     const padX = 20, padY = 10, gapX = 10, gapY = 15;
     const innerW = stageWidth - padX * 2 - gapX * (cols - 1);
     const cellW = innerW / cols;
@@ -112,13 +120,10 @@
 
     const realW = padX * 2 + (cols - 1) * (cellW + gapX) + cellW;
 
-    // 1) espacio que ocupará la leyenda
-    const legendH = 90;   // 90 px bastan para la barra de colores + títulos + círculos de tamaño
-
-    // 2) altura total del SVG (burbujas + leyenda)
+    // leyendas al fondo
+    const legendH = 90;
     const realH = padY*2 + (rowsCount-1)*(cellH+gapY) + cellH + legendH;
 
-    // 3) actualizamos el viewBox con la nueva altura
     svg.attr('viewBox', `0 0 ${realW} ${realH}`)
        .attr('preserveAspectRatio', 'xMidYMid meet');
 
@@ -128,7 +133,6 @@
     const rMax = Math.max(rMin + 6, cellW * 0.32);
     const rScale = d3.scaleSqrt().domain([vMin, vMax]).range([rMin, rMax]);
 
-    // 4) dibujamos las leyendas en la zona nueva (más abajo)
     const { xEnd } = drawColorLegend(svg, realW, realH - legendH + 20);
     drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, xEnd);
 
@@ -190,8 +194,37 @@
         });
       }
       const year = sel ? Number(sel.value) || data.years[0] : data.years[0];
+
+      // === NUEVO: guardar año actual
+      currentYear = year;
+
       renderGrid(year, data.rows[String(year)] || []);
-      if (sel) sel.addEventListener('change', () => renderGrid(Number(sel.value), data.rows[sel.value] || []));
+
+      if (sel) {
+        sel.addEventListener('change', () => {
+          currentYear = Number(sel.value); // === NUEVO: actualiza currentYear
+          renderGrid(currentYear, data.rows[sel.value] || []);
+        });
+      }
+
+      // === NUEVO: redibuja cuando cambie el ancho del contenedor de burbujas
+      const stageEl = document.querySelector('.panel-bubbles .stage');
+      if (stageEl) {
+        const ro = new ResizeObserver(() => {
+          if (currentYear != null) {
+            renderGrid(currentYear, data.rows[String(currentYear)] || []);
+          }
+        });
+        ro.observe(stageEl);
+      }
+
+      // === NUEVO: redibuja también al redimensionar la ventana
+      window.addEventListener('resize', () => {
+        if (currentYear != null) {
+          renderGrid(currentYear, data.rows[String(currentYear)] || []);
+        }
+      });
+
     } catch (err) {
       console.error('burbujas.js → Error:', err);
       svg.append('text').attr('x', 20).attr('y', 30)

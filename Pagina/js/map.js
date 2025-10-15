@@ -153,4 +153,31 @@
   // Exporta la fábrica para crear otras (modo comparar)
   window.createChileMap = createInstance;
 
+
 })();
+
+
+  // === CLICK EN REGIÓN ===
+  d3.selectAll(".region").on("click", function(event, d) {
+    const region = d3.select(this);
+    const regionName = region.attr("data-region") || d.properties?.region || "Región";
+
+    // Abre el panel de detalle
+    const grid = document.querySelector(".grid");
+    grid.classList.add("detail-open");
+
+    // Actualiza título
+    document.getElementById("detailTitle").textContent = `Detalle — ${regionName}`;
+
+    // Limpia y clona la región seleccionada dentro del SVG pequeño
+    const detailSvg = document.getElementById("detailRegionSvg");
+    if (detailSvg) {
+      detailSvg.innerHTML = "";
+      const clone = region.node().cloneNode(true);
+      clone.removeAttribute("class");
+      clone.setAttribute("fill", "#ff5ea8");
+      clone.setAttribute("stroke", "#fff");
+      clone.setAttribute("stroke-width", "2");
+      detailSvg.appendChild(clone);
+    }
+  });

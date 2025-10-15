@@ -1,846 +1,370 @@
 :root{
   --bg:#0b1020; --ink:#eef3ff; --panel:#11162a; --muted:#96a0c8;
-  --pink1:#ff5ea8;   
-  --pink2:#ff3f8e;
-  --pinkGlow: rgba(255, 98, 172, .45);
-}
-/* Aleja toda la página al 80 % */
-html {
-  zoom: 110%;        /* Chrome, Edge, Firefox 105+ */
+  --pink1:#ff5ea8; --pink2:#ff3f8e; --pinkGlow: rgba(255, 98, 172, .45);
 }
 
+/* Escala general (tu preferencia) */
+html{ zoom:110%; scroll-behavior:smooth; }
 *{ box-sizing:border-box }
 html,body{ height:100% }
-body{ margin:0; background:#0b1020; color:var(--ink); font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-.panel h2{ margin:12px 14px; font-size:14px; color:#cbd6ff; }
-.stage{ height:560px; padding:8px; }
-svg{ width:100%; height:100%; }
-@media (max-width:1024px){ .grid{ grid-template-columns:1fr } .stage{ height:420px } }
-.region { stroke:#0b1739; stroke-width:1; }
-
-/*PANEL*/
-.panel{ 
-    background:var(--panel); 
-    gap: 12px; 
-    border:1px solid #1b2747; 
-    border-radius:14px; 
-    overflow:hidden; 
-
-
-}
-.panel:first-of-type .stage {
-    height: 90vh; 
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 }
 
-.panel:first-of-type {
-  margin-bottom: 50px;
+/* ====== TOP BAR ====== */
+.topbar{
+  position:fixed; top:0; left:0; width:100%; z-index:1000;
+  display:flex; align-items:center; justify-content:center; gap:28px;
+  padding:14px 20px;
+  background: linear-gradient(180deg, rgba(13,20,48,.86), rgba(13,20,48,.70));
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid rgba(26,36,68,.65);
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
 }
+body{ padding-top:80px; } /* compensa topbar */
 
-
-
-.controls label {
-  font-size: 25px;
-  font-weight: 500;
+.nav{
+  width:100%; display:flex; justify-content:center; align-items:center;
+  gap:18px; flex-wrap:wrap; position:relative; padding-right:260px;
 }
+.nav-left{ display:flex; gap:32px; flex-wrap:wrap; }
 
-.controls select {
-  font-size: 18px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 2px solid #3b4a7a;
-  background-color: #1b2547;
-  color: var(--ink);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.controls select:hover {
-  background-color: #243566;
-}
-
-#definicion{
-    text-align: center;
-    font-size: 60px;
-}
-
-#DelitosVIFSatisfacción{
-    display:flex; 
-    font-size: 15px;
-    align-items:center;
-    gap:12px; 
-    padding:12px 16px; 
-    border-bottom:1px solid #1a2444; 
-    background:#0d1430; 
-    position:sticky; 
-    top:0;
-}
-
-#MapaRegion h2,
-#BurbujasGrilla h2 {
-  font-size: 48px;   
-  text-align: center;
-  color: #e5ebff;      
-  margin: 25px 50px;
-
-}
-
-/*GRID*/
-
-.grid{
-  display: grid;
-  grid-template-columns: 1fr;                 /* una sola columna */
-                             /* burbujas abajo */
-  gap: 16px;
-  padding: 14px;
-  align-items: start;
-}
-
-/* Oculta el panel de detalle cuando no está abierto */
-.grid:not(.detail-open) .panel-detail{
-  display: none;
-}
-
-.grid:not(.detail-open) .panel:first-of-type .stage{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* (Opcional) limita el ancho máximo del SVG centrado */
-.grid:not(.detail-open) #mapSvg{
-  max-width: 1100px; /* ajusta a gusto */
-  width: 100%;
-  height: 100%;
-  transform:none;
-}
-
-/* === Estado CON detalle abierto: vuelves a 2 columnas como ya tienes === */
-.grid.detail-open{
-  grid-template-columns: 0.95fr 1.05fr;  
-
-}
-
-/* 1) Los NO-panel (títulos/definición/controles) ocupan SIEMPRE todo el ancho */
-.grid > :not(.panel){
-  grid-column: 1 / -1;
-}
-
-/* 2) Cuando se abre detalle, posicionamos explícitamente los paneles */
-.grid.detail-open > .panel:first-of-type{   /* 1er panel = MAPA */
-  grid-column: 1;   /* columna izquierda */
-  grid-row: 1;
-}
-
-.grid.detail-open > .panel.panel-detail{    /* panel del CUADRADO AZUL */
-  grid-column: 2;   /* columna derecha */
-  grid-row: 1;
-}
-
-.grid.detail-open > .panel:nth-of-type(2){  /* 2do panel = BURBUJAS */
-  grid-column: 1 / -1;  /* abajo a lo ancho */
-  grid-row: 2;
-}
-
-/* Mantén altura automática de filas en el grid */
-.grid { grid-auto-rows: auto; }
-
-/* --- Bloques superiores SIEMPRE arriba cuando hay detalle abierto --- */
-.grid.detail-open > #satisfaccion{
-  grid-column: 1 / -1;
-  grid-row: 1;
-}
-.grid.detail-open > #definicion{
-  grid-column: 1 / -1;
-  grid-row: 2;
-}
-.grid.detail-open > #DelitosVIFSatisfacción{
-  grid-column: 1 / -1;
-  grid-row: 3;
-}
-
-/* --- Paneles cuando hay detalle abierto --- */
-/* 1er panel (MAPA) a la izquierda en la fila 4 */
-.grid.detail-open > .panel:first-of-type{
-  grid-column: 1;
-  grid-row: 4;
-}
-
-/* Panel de detalle (CUADRADO AZUL) a la derecha en la fila 4 */
-.grid.detail-open > .panel.panel-detail{
-  grid-column: 2;
-  grid-row: 4;
-}
-
-/* 2do panel (BURBUJAS) abajo ocupando todo el ancho en la fila 5 */
-.grid.detail-open > .panel:nth-of-type(2){
-  grid-column: 1 / -1;
-  grid-row: 5;
-}
-
-
-
-.detail-box {
-  background: #243566;           /* azul más claro */
-  border: 1px solid #2e3f73;
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin: 8px 14px 16px;         /* separa del título y del SVG de burbujas */
-  display: none;                  /* controlado por [hidden] */
-  min-height: 220px;              /* puedes subirlo si quieres más alto */
-}
-.detail-box:not([hidden]) {
-  display: block;
-}
-
-
-/* Títulos y botón del recuadro */
-.detail-box h3 {
-  margin: 0 0 8px 0;
-  color: #e5ebff;
-  font-size: 22px;
-}
-.detail-box p {
-  margin: 0 0 14px 0;
-  color: #cbd6ff;
-}
-
-.close-detail {
-  background: #1b2547;
-  color: var(--ink);
-  border: 1px solid #3b4a7a;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.close-detail:hover {
-  background: #2a3a6f;
-}
-
-.panel-map    { grid-area: map; }
-.panel-detail { grid-area: detail; }
-.panel-bubbles{ grid-area: bubbles; }
-
-
-/* Botonera del header */
-.topbar { justify-content: center; }       /* centra la nav en la barra */
-
-
-/* Estilos de botón */
 .btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 16px;
-  border-radius:10px;
-  border:1px solid #3b4a7a;
-  background:#1b2547;
-  color: var(--ink);
-  font-size:30px;
-  text-decoration:none;
-  transition: background .2s, transform .08s;
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 18px; border-radius:999px; border:1px solid #31437a;
+  background:linear-gradient(180deg,#1b2547,#172140);
+  color:var(--ink); text-decoration:none; letter-spacing:.2px;
+  font-size:16px; outline:0;
+  transition:transform .08s, box-shadow .2s, background .2s, border-color .2s;
+  box-shadow:0 6px 16px rgba(9,14,30,.25), inset 0 1px 0 rgba(255,255,255,.03);
 }
-.btn:hover{ background:#2a3a6f; }
-.btn:active{ transform: translateY(1px); }
-
-
-.topbar { z-index: 1000; }
-
-/* Transición del mapa cuando hay detalle abierto */
-.grid.detail-open #mapSvg{
-  transition: transform 420ms ease;
-  transform: translateX(-18px) scale(.96);
+.btn:hover{
+  background:linear-gradient(180deg,#243566,#1b274d);
+  border-color:#3c56a0; box-shadow:0 10px 22px rgba(9,14,30,.35), inset 0 1px 0 rgba(255,255,255,.05);
 }
-
-
-
-/* Mejora legibilidad de la leyenda (si la tienes) */
-#legend text{ fill:#cbd6ff }
-
-
-/* KPIs (GRANDES) */
-.kpi-row{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin: 14px 0 10px;
+.btn:active{ transform:translateY(1px) }
+.btn.is-active{
+  border-color:#8aa2ff;
+  background:linear-gradient(180deg,#2b3b7a,#223169);
+  box-shadow:0 0 0 2px rgba(138,162,255,.18), 0 10px 26px rgba(9,14,30,.45);
 }
-.kpi{
-  background:#1e2b54;
-  border:1px solid #2b3a6e;
-  border-radius:14px;
-  padding:14px 16px;
-  text-align:center;
+.btn.is-active::after{
+  content:""; position:absolute; left:16px; right:16px; bottom:-6px; height:3px; border-radius:3px;
+  background:linear-gradient(90deg,#90a7ff,#5d82ff);
 }
-.kpi .icon{
-  font-size:46px; line-height:1; opacity:.95;
-  margin-bottom:4px;
+.btn-help{
+  background:linear-gradient(180deg,var(--pink1),var(--pink2));
+  border-color:#ffc6e0; color:#fff;
+  position:absolute; right:40px; top:50%; transform:translateY(-50%);
+  box-shadow:0 8px 24px var(--pinkGlow), inset 0 1px 0 rgba(255,255,255,.15);
 }
-.kpi .value{
-  font-size:54px; font-weight:800; letter-spacing:.3px;
-  line-height:1.05;
-}
-kpi.sub{
-  font-size:30px;
-  line-height:1.35;
-  color:#e1e7ff;
-  opacity:1;
-  margin-top:8px;       /* un poco más de aire bajo el número */
-  letter-spacing:.2px;
-}
-.kpi .rank{
-  font-size:23px;
-  line-height:1.35;
-  color:#a9bcff;
-  margin-top:6px;
+.btn-help:hover{
+  background:linear-gradient(180deg,#ff77b5,#ff4f98);
+  transform:translateY(-52%) scale(1.05);
+  box-shadow:0 12px 32px var(--pinkGlow), 0 0 0 2px rgba(255,170,210,.35) inset;
 }
 
+/* ====== INICIO (como en tu diseño anterior) ====== */
+.section{ padding:32px 18px; }
 
-/* Ajustes móviles para que no se desborde */
-@media (max-width: 900px){
-    .kpi-row{ grid-template-columns: 1fr 1fr; gap: 12px; }
-    .kpi .icon{ font-size:36px; }
-    .kpi .value{ font-size:42px; }
-    .kpi .sub{ font-size:23px; }
-    .kpi .rank{ font-size:19px; }
-
+/* Hero ancho completo con imagen oscurecida y tipografías grandes */
+#inicio.section.hero{
+  width:100vw; position:relative; left:50%; right:50%;
+  margin-left:-50vw; margin-right:-50vw;
+  background:#0b1020; padding:100px 8vw 60px;
+}
+.hero-bg img{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; filter:brightness(.4);
+}
+.hero-overlay{ position:absolute; inset:0;
+  background:linear-gradient(0deg, rgba(255,94,168,.15) 0%, rgba(11,16,32,.7) 100%);
+}
+.hero-content{ position:relative; z-index:2; width:min(1100px,92vw); margin:0 auto; }
+.hero-layer h1{
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 800; line-height:1.05; margin:0 0 24px;
+  text-shadow:0 0 20px rgba(255,94,168,.35);
+}
+.hero-layer .highlight{ color:#ff5ea8; }
+.hero-layer p{
+  font-size: clamp(18px, 2.1vw, 22px);
+  line-height:1.7; color:#dbe3ff; margin:0 0 12px;
+}
+/* Bloque “¿Qué es…?” justo después, grande */
+#inicio h2{
+  font-size: clamp(32px, 3.6vw, 48px);
+  margin: 24px 0 8px; color:#e5ebff;
 }
 
+/* ====== CONTROLES AÑO ====== */
+#DelitosVIFSatisfacción{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-bottom:1px solid #1a2444;
+  background:#0d1430; position:sticky; top:0; z-index:5;
+  font-size:15px;
+}
+.controls label{ font-size:18px; font-weight:500; }
+.controls select{
+  font-size:18px; padding:10px 16px; border-radius:8px;
+  border:2px solid #3b4a7a; background:#1b2547; color:var(--ink); cursor:pointer; transition:.2s;
+}
+.controls select:hover{ background:#243566; }
 
-/* Dos tarjetas */
-.cards-2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:8px; }
-.card{ background:#1b274d; border:1px solid #2b3a6e; border-radius:12px; padding:12px 14px; }
-.card h4{ margin:0 0 8px; color:#e5ebff; font-size: 30px; }
+/* ====== GRID PRINCIPAL ====== */
+.grid{
+  display:grid; gap:16px; padding:20px; align-items:start;
+}
+.panel{
+  background:var(--panel); border:1px solid #1b2747; border-radius:14px;
+  overflow:hidden; gap:12px;
+}
+.panel h2{
+  margin:20px 14px 0; font-size:48px; color:#e5ebff; text-align:center;
+}
+.stage{ height:560px; padding:8px; }
 
-/* Pastillas VIF */
-.pill{ display:flex; justify-content:space-between; align-items:center; gap:8px;
-  background:#0f1a3a; border:1px solid #2b3a6e; border-radius:999px; padding:8px 12px; margin-bottom:8px; }
-.pill span{ color:#cbd6ff; font-size:25px; }
-.pill strong{ font-size:30px; }
+/* ——— SVG: REGLAS CORRECTAS ———
+   Solo los SVG grandes llenan su contenedor */
+#mapSvg, #mapSvgL, #mapSvgR, #gridSvg{
+  width:100%; height:100%;
+}
+.region{ stroke:#0b1739; stroke-width:1; transition:opacity .25s, filter .25s; cursor:pointer; }
+.region.hover{ filter: drop-shadow(0 0 12px var(--pinkGlow)); }
 
-/* Lista bullets */
-.bullets{ margin:8px 0 0; padding-left:20px; }
-.bullets li{ margin:4px 0; }
+/* Modo comparar */
+.stage-compare{
+  display:grid; grid-template-columns:1fr 1fr; gap:14px; height:90vh; padding:8px;
+}
+.compare-pane{ position:relative; background:transparent; }
+.map-subtitle{
+  position:absolute; top:8px; left:10px; padding:6px 10px; border-radius:10px; font-size:14px;
+  background:#0f1a3a; color:#e5ebff; border:1px solid #2e3f73; pointer-events:none;
+}
+#singleStage, #compareStage{ transition:opacity .25s ease; }
+#singleStage[hidden], #compareStage[hidden]{ opacity:0; }
 
-/* Región en detalle más chica */
-#detailRegionSvg{ display:block; margin: 2px 0 6px; border-radius:8px; }
+/* ====== DETALLE (POPUP LATERAL) ====== */
+.panel:first-of-type .stage{ height:90vh; } /* mapa alto */
+.panel:first-of-type{ margin-bottom:50px; }
 
-/* Botón cerrar: más grande y con flecha */
+.detail-box{
+  background:#243566; border:1px solid #2e3f73; border-radius:12px;
+  padding:16px 18px; margin:8px 14px 16px; display:none; min-height:220px; text-align: center;
+}
+.detail-box:not([hidden]){ display:block; }
+
+/* — Fix CRÍTICO: mini mapa visible — */
+#detailRegionSvg {
+  display: block;
+  margin: 20px auto 24px;        /* centrado y con aire arriba/abajo */
+  width: 100%;
+  height: auto;
+  max-width: 500px;              /* agranda la región dentro del recuadro */
+  max-height: 320px;
+        /* mantiene proporción similar a Chile */
+  background: transparent;
+}
+
+/* Tipos del cuadro y botón */
+.panel h1{ text-align:center; margin:14px 0 10px; font-size:32px; width:100%; }
+.detail-box h3{ margin:0 0 8px; color:#e5ebff; font-size:22px; }
+.detail-box p{ margin:0 0 14px; color:#cbd6ff; }
 .close-detail{
-  background:#1b2547; color:var(--ink);
-  border:1px solid #3b4a7a; border-radius:10px;
-  padding:10px 18px; font-size:16px; cursor:pointer;
-  display:inline-flex; align-items:center; gap:10px;
+  background:#1b2547; color:var(--ink); border:1px solid #3b4a7a; border-radius:10px;
+  padding:10px 18px; font-size:16px; cursor:pointer; display:inline-flex; align-items:center; gap:10px;
 }
 .close-detail::before{ content:"←"; font-size:18px; }
 .close-detail:hover{ background:#2a3a6f; }
 
-/* Capa de vuelo */
-#flyLayer{ position:fixed; inset:0; pointer-events:none; z-index: 999; }
+/* KPIs */
+.kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:14px 0 10px; }
+.kpi{
+  background:#1e2b54; border:1px solid #2b3a6e; border-radius:14px; padding:14px 16px; text-align:center;
+}
+.kpi .icon{ font-size:46px; line-height:1; opacity:.95; margin-bottom:4px; }
+.kpi .value{ font-size:54px; font-weight:800; letter-spacing:.3px; line-height:1.05; }
+.kpi .sub{ font-size:18px; color:#e1e7ff; margin-top:6px; }
+.kpi .rank{ font-size:20px; color:#a9bcff; margin-top:4px; }
+
+/* Tarjetas dentro del detalle */
+.cards-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
+.card{ background:#1b274d; border:1px solid #2b3a6e; border-radius:12px; padding:12px 14px; }
+.card h4{ margin:0 0 8px; color:#e5ebff; font-size:20px; }
+.pill{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  background:#0f1a3a; border:1px solid #2b3a6e; border-radius:999px; padding:8px 12px; margin-bottom:8px;
+}
+.pill span{ color:#cbd6ff; font-size:16px; }
+.pill strong{ font-size:18px; }
+.bullets{ margin:8px 0 0; padding-left:20px; }
+.bullets li{ margin:4px 0; }
+
+/* ====== BURBUJAS ====== */
+#BurbujasGrilla + .stage{ height:700px; } /* como tenías */
+.panel-bubbles .stage{ display:block; width:100%; }
+
+/* ====== GRID: comportamiento al abrir/cerrar detalle ====== */
+.grid:not(.detail-open) .panel-detail{ display:none; }  /* oculto el popup cerrado */
+
+.grid.detail-open{
+  grid-template-columns:0.95fr 1.05fr;
+  grid-auto-rows:auto;
+}
+.grid > :not(.panel){ grid-column:1 / -1; } /* elementos no-panel a todo el ancho */
+.grid.detail-open > .panel:first-of-type{ grid-column:1; grid-row:1; }     /* mapa izq */
+.grid.detail-open > .panel.panel-detail{ grid-column:2; grid-row:1; }     /* detalle der */
+.grid.detail-open > .panel.panel-bubbles{ grid-column:1 / -1; grid-row:2; }/* burbujas abajo */
+
+/* Micro-animación al abrir detalle (solo el mapa) */
+.grid.detail-open #mapSvg{ transition:transform 420ms ease; transform:translateX(-18px) scale(.96); }
+
+/* ====== MOTIVACIÓN (tu diseño: centrado, 5 tarjetas) ====== */
+#motivacion.section.motivation{
+  width:100vw; position:relative; left:50%; right:50%;
+  margin-left:-50vw; margin-right:-50vw;
+  background:#0b1020; padding:60px 6vw 100px;
+}
+#motivacion .container{ width:min(1100px,92vw); margin:0 auto; }
+#motivacion h2{
+  font-size: clamp(40px, 5vw, 64px);
+  margin: 0 0 24px; color:#e5ebff; text-align:left;
+}
+.tips{
+  display:grid; gap:18px;
+  grid-template-columns:repeat(5, minmax(160px,1fr));
+}
+.tip{
+  background:#11162a; border:1px solid #1b2747; border-radius:14px; padding:18px;
+  color:#cfd8ff;
+}
+.tip h3{ margin:0 0 8px; font-size:20px; color:#cfd8ff; }
+.tip p{ margin:0; font-size:16px; line-height:1.55; color:#bfc8f8; }
+.cta-row{ margin-top:24px; text-align:center; }
+.cta-text{ font-size: clamp(18px, 2.2vw, 24px); }
+
+@media (max-width:1200px){
+  .tips{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+}
+@media (max-width:900px){
+  .tips{ grid-template-columns:1fr; }
+  .btn{ font-size:15px; padding:9px 14px; }
+  .topbar{ gap:16px; padding:12px; }
+  .kpi-row{ grid-template-columns:1fr 1fr; gap:12px; }
+  #motivacion h2{ text-align:center; }
+}
+
+/* Leyenda del mapa (si la tienes) */
+#legend text{ fill:#cbd6ff }
+
+/* Capa de vuelo (si la usas) */
+#flyLayer{ position:fixed; inset:0; pointer-events:none; z-index:999; }
 #flyLayer svg{ position:absolute; left:0; top:0; overflow:visible; }
-.fly-shape{
-  will-change: transform, opacity;
-  transition: transform 560ms cubic-bezier(.22,.61,.36,1), opacity 240ms ease;
+.fly-shape{ will-change:transform, opacity; transition:transform 560ms cubic-bezier(.22,.61,.36,1), opacity 240ms ease; }
+
+
+/* =========================================================
+   1) TOPBAR: botones más grandes
+   ========================================================= */
+.topbar { padding: 18px 26px; }
+.topbar .btn{
+  font-size: clamp(25px, 2.1vw, 24px);
+  padding: 20px 24px;
+  border-width: 2px;
+}
+.topbar .btn-help{
+  padding: 20px 28px;
 }
 
+/* =========================================================
+   2) INICIO: cajas rosadas para las dos frases
+   (usa tus p de .layer2 y .layer3, sin tocar el HTML)
+   ========================================================= */
+.hero .layer2 p,
+.hero .layer3 p{
+  display: inline-block;
+  margin: 10px auto;
+  padding: 18px 24px;
+  max-width: 900px;
 
-
-/* ===== One-page: scroll suave y compensación por header sticky ===== */
-html { scroll-behavior: smooth; }
-#inicio, #stats, #motivacion { scroll-margin-top: 90px; }
-
-
-
-/* Hero (Inicio) */
-.hero h1 {
-  margin: 0 0 10px;
-  font-size: 42px;
-  color: #e5ebff;
-}
-.hero h2 {
-  margin: 26px 0 8px;
-  font-size: 28px;
-  color: #cbd6ff;
-}
-.hero p {
-  margin: 0 0 10px;
-  color: #dbe3ff;
-  font-size: 18px;
-  line-height: 1.6;
-}
-
-/* Motivación */
-.motivation h2 { font-size: 32px; color:#e5ebff; margin: 0 0 18px; }
-
-@media (max-width: 900px){
-  .tips { grid-template-columns: 1fr; }
-}
-
-
-body {
-  padding-top: 80px; /* Ajusta según la altura real del header */
-}
-
-
-/* ===== Topbar “glass” + mejor spacing ===== */
-.topbar {
-  backdrop-filter: saturate(140%) blur(8px);
-  -webkit-backdrop-filter: saturate(140%) blur(8px);
-  background: linear-gradient(180deg, rgba(13,20,48,.86), rgba(13,20,48,.70));
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  border-bottom: 1px solid rgba(26,36,68,.65);
-  padding: 14px 20px;
-  gap: 28px; /* más aire entre botones */
-}
-
-/* Contenedor de la nav para no estirar de más en pantallas muy grandes */
-.nav {
-  width: 100%;
-  max-width: none;          /* antes: 1100px */
-  margin: 0;                /* antes: 0 auto */
-  display: flex;
-  align-items: center;
-  justify-content: center;  /* mantiene centrados los otros botones */
-  gap: 18px;
-  flex-wrap: wrap;
-  position: relative;       /* referencia para el absolute del help */
-  padding-right: 260px;     /* reserva espacio para el botón rosa */
-}
-.nav-left{ display:flex; gap:32px; flex-wrap:wrap; }
-
-/* ===== Botones: pill, micro-animaciones y foco accesible ===== */
-.btn{
-  position: relative;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid #31437a;
-  background: linear-gradient(180deg, #1b2547, #172140);
-  color: var(--ink);
-  font-size: 16px;             /* mantenemos legible sin ser gigante */
-  letter-spacing: .2px;
-  text-decoration: none;
-  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
-  box-shadow: 0 6px 16px rgba(9,14,30,.25), inset 0 1px 0 rgba(255,255,255,.03);
-  outline: none;
-}
-.btn:hover{
-  background: linear-gradient(180deg, #243566, #1b274d);
-  border-color: #3c56a0;
-  box-shadow: 0 10px 22px rgba(9,14,30,.35), inset 0 1px 0 rgba(255,255,255,.05);
-}
-.btn:active{ transform: translateY(1px) scale(.99); }
-.btn:focus-visible{
+  border: 2px solid var(--pink1);
+  border-radius: 16px;
+  background: rgba(17,22,42,.55);
   box-shadow:
-    0 0 0 3px rgba(93, 130, 255, .25),
-    0 8px 24px rgba(9,14,30,.35);
-  border-color: #5d82ff;
+    0 0 0 2px rgba(255,94,168,.15) inset,
+    0 10px 28px var(--pinkGlow);
 }
 
-/* Botón de ayuda con leve acento */
-
-.btn-help:focus-visible{
-  box-shadow:
-    0 0 0 3px rgba(255, 170, 210, .45),
-    0 10px 30px var(--pinkGlow);
-  border-color:#ffd2e7;
+/* =========================================================
+   3) INICIO: centrar todo el texto
+   ========================================================= */
+#inicio .hero-content{
+  text-align: center;
+  justify-items: center;   /* centra los “bloques” del grid */
+}
+#inicio h1, #inicio h2, #inicio p{
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* ===== Indicador “activo” (scroll-spy) ===== */
-.btn.is-active{
-  border-color:#8aa2ff;
-  background: linear-gradient(180deg, #2b3b7a, #223169);
-  box-shadow:
-    0 0 0 2px rgba(138,162,255,.18),
-    0 10px 26px rgba(9,14,30,.45);
-}
-.btn.is-active::after{
-  content:"";
-  position:absolute;
-  left: 16px; right:16px; bottom:-6px;
-  height:3px; border-radius:3px;
-  background: linear-gradient(90deg, #90a7ff, #5d82ff);
-  opacity:.9;
-}
+/* (por si algún estilo heredado los empuja a la izquierda) */
+.hero .layer2, .hero .layer3, .hero .layer4{ justify-self: center; }
 
-
-/* ===== Detalles visuales coherentes con tu UI (secciones nuevas) ===== */
-.section { padding: 32px 18px; }
-
-.hero h1 { margin:0 0 10px; font-size:42px; color:#e5ebff; }
-.hero h2 { margin:24px 0 8px; font-size:28px; color:#cbd6ff; }
-.hero p  { margin:0 0 10px; color:#dbe3ff; font-size:18px; line-height:1.6; }
-
-.motivation h2 { font-size: 32px; color:#e5ebff; margin: 0 0 18px; }
-.tips {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-.tip {
-  background:#11162a;
-  border:1px solid #1b2747;
-  border-radius: 14px;
-  padding: 14px;
-}
-.tip h3 { margin:0 0 6px; color:#cfd8ff; font-size: 20px; }
-.tip p  { margin:0; color:#bfc8f8; font-size: 16px; line-height:1.5; }
-
-
-@media (max-width: 900px){
-  .tips { grid-template-columns: 1fr; }
-  .btn { font-size: 15px; padding: 9px 14px; }
-  .topbar { gap: 16px; padding: 12px 12px; }
-}
-
-.topbar{
-  position: fixed; top:0; left:0; width:100%; z-index:1000;
-  display:flex; align-items:center; justify-content:center; gap:28px;
-  padding:14px 20px;
-  border-bottom: 1px solid rgba(26,36,68,.65);
-  background: linear-gradient(180deg, rgba(13,20,48,.86), rgba(13,20,48,.70));
-  backdrop-filter: saturate(140%) blur(8px);
-  -webkit-backdrop-filter: saturate(140%) blur(8px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-}
-
-
-/* === HERO y MOTIVACIÓN realmente full-width === */
-#inicio.section.hero,
-#motivacion.section.motivation {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  background: #0b1020;
-  padding: 100px 8vw;
-}
-
-/* Forzamos el contenido interno a ocupar todo el ancho */
-#inicio.section.hero .container,
-#motivacion.section.motivation .container {
-  max-width: none !important;
-  width: 100%;
-  margin: 0;
-  padding: 0 8vw;
-}
-
-/* --- Tipografía del INICIO --- */
-#inicio h1 {
-  font-size: clamp(64px, 8vw, 100px);
-  line-height: 1.05;
-  margin-bottom: 28px;
-}
-#inicio h2 {
-  font-size: clamp(42px, 5vw, 68px);
-  margin: 40px 0 18px;
-}
-#inicio p,
-#inicio li {
-  font-size: clamp(24px, 2.6vw, 30px);
-  line-height: 1.8;
-}
-
-/* --- Sección MOTIVACIÓN --- */
-#motivacion {
-  background: linear-gradient(180deg, #11162a 0%, #0b1020 100%);
+/* =========================================================
+   4) MOTIVACIÓN: tipografía más grande (mismo layout de 5 tarjetas)
+   ========================================================= */
+#motivacion{
   padding-top: 120px;
   padding-bottom: 120px;
 }
-#motivacion h2 {
+#motivacion h2{
   font-size: clamp(56px, 6vw, 90px);
+  line-height: 1.08;
+  text-align: center;
   margin-bottom: 48px;
 }
-#motivacion .tip h3 {
-  font-size: clamp(28px, 3.2vw, 40px);
+#motivacion .tips{
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+  justify-items: center;         /* centra cada tarjeta en su columna */
 }
-#motivacion .tip p {
-  font-size: clamp(22px, 2.5vw, 28px);
-  line-height: 1.75;
+#motivacion .tip{
+  padding: 22px 22px;
+  border-radius: 14px;
+  max-width: 360px;              /* mantiene el look de “tarjeta” */
+  text-align: left;              /* igual que antes dentro de la tarjeta */
 }
-
-/* Tips más amplios y centrados */
-#motivacion .tips {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 36px;
+#motivacion .tip h3{
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.25;
 }
-#motivacion .tip {
-  padding: 32px;
-  border-radius: 20px;
+#motivacion .tip p{
+  font-size: clamp(16px, 1.9vw, 20px);
+  line-height: 1.6;
 }
-
-/* CTA grande */
-#motivacion .cta-text {
-  font-size: clamp(30px, 3vw, 40px);
+#motivacion .cta-text{
+  font-size: clamp(28px, 3vw, 40px);
   text-align: center;
-  margin-top: 70px;
-}
-#motivacion .cta-btn {
-  font-size: clamp(24px, 2.5vw, 34px);
-  padding: 16px 36px;
-  border-radius: 999px;
-  margin-top: 24px;
+  margin-top: 60px;
 }
 
-
-/* === BOTONES SUPERIORES (HEADER) GRANDES === */
-.topbar {
-  padding: 24px 40px;                 /* más alto y con más aire lateral */
-  gap: 40px;                          /* separación entre botones */
-}
-
-
-
-.btn {
-  font-size: clamp(22px, 2.5vw, 32px); /* tamaño grande y fluido */
-  padding: 18px 36px;                 /* más área de clic */
-  border-radius: 999px;
-  border-width: 2px;
-  font-weight: 600;
-  background: linear-gradient(180deg, #1c2850, #152040);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
-  transition: transform 0.08s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-}
-
-/* Efecto hover más notorio */
-.btn:hover {
-  background: linear-gradient(180deg, #2b3c7a, #1f2b55);
-  border-color: #5d82ff;
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 12px 32px rgba(9,14,30,0.5);
-}
-
-/* Botón activo (scroll-spy) */
-.btn.is-active {
-  border-color: #8aa2ff;
-  background: linear-gradient(180deg, #3349a2, #243372);
-  box-shadow: 0 0 0 3px rgba(138,162,255,0.3), 0 10px 30px rgba(9,14,30,0.55);
-}
-
-
-/* Ajuste responsive para móviles */
-@media (max-width: 900px) {
-  .btn {
-    font-size: 20px;
-    padding: 14px 28px;
-  }
-  .topbar {
-    gap: 20px;
-    padding: 18px 20px;
-  }
-}
-
-/* --- FINAL: botón de ayuda rosado y alineado a la derecha --- */
-.nav{
-  position: relative;         /* contenedor de referencia */
-  padding-right: 260px;       /* espacio para el botón */
-}
-
-.btn-help{
-  background: linear-gradient(180deg, var(--pink1), var(--pink2));
-  border-color: #ffc6e0;
-  color: #fff;
-
-  position: absolute;
-  right: 40px;                /* borde derecho */
-  top: 50%;
-  transform: translateY(-50%);
-
-  box-shadow:
-    0 8px 24px var(--pinkGlow),
-    inset 0 1px 0 rgba(255,255,255,.15);
-}
-
-.btn-help:hover{
-  background: linear-gradient(180deg, #ff77b5, #ff4f98);
-  transform: translateY(-52%) scale(1.05);
-  box-shadow:
-    0 12px 32px var(--pinkGlow),
-    0 0 0 2px rgba(255,170,210,.35) inset;
-}
-/* brillo sin escala */
-.region {
-    transition: opacity .25s ease, filter .25s ease;
-    cursor: pointer;
-}
-.region.hover {
-    filter: drop-shadow(0 0 12px var(--pinkGlow)); /* resplandor rosa */
-    /* si quieres más fuerza: drop-shadow(0 0 20px #ff62ac) */
-}
-
-/* Más alto solo el panel de burbujas */
-#BurbujasGrilla + .stage { 
-  height: 700px;   /* prueba 700–800px */
-}
-
-
-
-
-.panel h1 {
-  text-align: center;
-  margin-bottom: 20px;
+/* =========================================================
+   EXTRA: mantenemos la región del pop-up grande y centrada
+   (del fix anterior, lo dejo aquí para que no se pierda)
+   ========================================================= */
+#detailRegionSvg {
+  display: block;
+  margin: 20px auto 24px;
   width: 100%;
-  font-size: 50px;
+  height: auto;
+  max-width: 420px;
+  max-height: 320px;
+  aspect-ratio: 1 / 0.65;
 }
 
-
-/* ===== Modo comparar (2 mapas) ===== */
-.stage-compare{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  height: 90vh;               /* igual que el primer panel si lo usas alto */
-  padding: 8px;
-}
-.compare-pane{
-  position:relative;
-  background: transparent;
-}
-.map-subtitle{
-  position:absolute;
-  top:8px; left:10px;
-  padding:6px 10px;
-  border-radius:10px;
-  font-size:14px;
-  background:#0f1a3a;
-  color:#e5ebff;
-  border:1px solid #2e3f73;
-  pointer-events:none;
-}
-
-/* transición suave al alternar modo */
-#singleStage, #compareStage{ transition: opacity .25s ease; }
-#singleStage[hidden], #compareStage[hidden]{ opacity:0; }
-
-/* (se mantiene tu transición del mapa cuando abres detalle) */
+.detail-box { text-align: center; }
 
 
-.hero-content {
-  position: relative;
-  z-index: 2;
-  width: min(1200px, 92vw);   
-  margin: 0 auto;
-  padding: 0 16px;
 
-  display: grid;
-  /* 2 columnas iguales en desktop */
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "l1 l1"
-    "l2 l3"
-    "l4 l4";
-  gap: 36px;
-  align-items: stretch;       
-  justify-items: center;      
-}
-
-/* Cuando agregamos la clase .swap, invertimos los cuadros */
-.hero-content.swap {
-  grid-template-areas:
-    "l1 l1"
-    "l3 l2"
-    "l4 l4";
-}
-
-/* Zonas */
-.layer1 { grid-area: l1; }
-.layer2 { grid-area: l2; }
-.layer3 { grid-area: l3; }
-.layer4 { grid-area: l4; margin-top: 8px; }
-
-/* Título grande centrado */
-.layer1 h1 {
-  font-size: clamp(34px, 6vw, 64px);
-  font-weight: 800;
-  line-height: 1.1;
-  text-shadow: 0 0 20px rgba(255,94,168,.4);
-  margin: 0;
-}
-.layer1 .highlight { color: #ff5ea8; }
-
-/* ——— “Cuadrados” iguales (layer2 y layer3) ——— */
-.hero-card {
-  /* Igual look para ambos */
-  background: rgba(17,22,42,0.6);
-  border: 1px solid #ff5ea8;
-  border-radius: 16px;
-  padding: clamp(16px, 3vw, 28px);
-
-  /* Igual alto y centrado interno */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: clamp(120px, 18vh, 220px);  
-  width: 100%;
-
-  /* Texto */
-  font-size: clamp(16px, 2.2vw, 22px);
-  line-height: 1.55;
-}
-
-/* Texto del bloque de definición (abajo) */
-.layer4 h2 {
-  font-size: clamp(26px, 3.8vw, 42px);
-  margin: 0 0 6px;
-}
-.layer4 p {
-  font-size: clamp(16px, 2.2vw, 22px);
-  margin: 0;
-}
-
-/* Imagen y overlay (sin cambios de fondo) */
-.hero-bg img {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  filter: brightness(0.4);
-}
-.hero-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(255,94,168,.15) 0%, rgba(11,16,32,.7) 100%);
-}
-
-/* ——— Responsive: 1 sola columna en móvil ——— */
-@media (max-width: 900px){
-  .hero-content {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "l1"
-      "l2"
-      "l3"
-      "l4";
-    gap: 18px;
-  }
-  .hero-content.swap {
-    /* En mobile no alternamos (no hace falta) */
-    grid-template-areas:
-      "l1"
-      "l2"
-      "l3"
-      "l4";
-  }
-}
-
-/* --- Regla CSS para el Pop-up / Tooltip de la Región --- */
-/*
-  Asumiendo que tu tooltip de D3 tiene una clase como '.tooltip',
-  '.region-tooltip' o '.popup'. Ajusta el selector si es necesario.
-*/
-.region-tooltip {
-  /* Habilitamos el posicionamiento absoluto */
-  position: absolute; 
-  /* Aseguramos que flote sobre todos los demás elementos, incluyendo SVGs y paneles */
-  z-index: 1000; 
-  /* Agrega estilos visuales básicos para que se vea */
-  background: #11162a; 
-  border: 1px solid #3b4a7a;
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: var(--ink);
-  pointer-events: none; /* Crucial: permite interactuar con elementos debajo */
-  
-  /* Esto ayuda a que el pop-up no se desborde fuera de la pantalla */
-  max-width: 250px;
-}
