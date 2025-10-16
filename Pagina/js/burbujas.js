@@ -18,7 +18,7 @@
 
     // Colores vivos: rosado -> violeta -> cian (bajo -> medio -> alto)
     const css     = getComputedStyle(document.documentElement);
-    const cPink   = (css.getPropertyValue('--pink2') || '#ff3f8e').trim(); // rosado fuerte
+    const cPink   = (css.getPropertyValue('--pink2') || '#ff3f8e').trim();
     const cViolet = '#8a6bff';
     const cCyan   = '#21c4ff';
 
@@ -29,19 +29,35 @@
     window.ScalesBurbujas.satDomain = domain;
 
     window.ScalesBurbujas.color = d3.scaleLinear()
-      .domain([domain[0], (domain[0] + domain[1]) / 2, domain[1]]) // bajo→medio→alto
+      .domain([domain[0], (domain[0] + domain[1]) / 2, domain[1]])
       .range([cPink, cViolet, cCyan])
       .interpolate(d3.interpolateRgb.gamma(2.2));
   }
 
-  // --------- UI: Select "Orden de las burbujas" (inyectado) ----------
-  function ensureSortControl() {
+  // --------- UI: contenedor de controles (reutilizable) ----------
+  function ensureControlsHost() {
     const host = document.querySelector('#BurbujasGrilla');
-    if (!host || host.querySelector('#bubbleOrderSel')) return;
+    if (!host) return null;
 
-    const wrap = document.createElement('div');
-    wrap.className = 'controls';
-    wrap.style.margin = '8px 14px 0';
+    // si ya existe un wrapper de controles, úsalo
+    let wrap = host.querySelector('.controls-burbujas');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'controls controls-burbujas';
+      wrap.style.display = 'flex';
+      wrap.style.flexWrap = 'wrap';
+      wrap.style.alignItems = 'center';
+      wrap.style.gap = '16px';
+      wrap.style.margin = '8px 14px 0';
+      host.appendChild(wrap);
+    }
+    return wrap;
+  }
+
+  // --------- UI: Select "Orden de las burbujas" ----------
+  function ensureSortControl() {
+    const wrap = ensureControlsHost();
+    if (!wrap || wrap.querySelector('#bubbleOrderSel')) return;
 
     const label = document.createElement('label');
     label.setAttribute('for', 'bubbleOrderSel');
@@ -64,7 +80,7 @@
     sel.value = currentSort;
 
     sel.addEventListener('change', () => {
-      currentSort = sel.value; // 'sat' | 'vif' | 'del'
+      currentSort = sel.value;
       if (currentYear != null && dataset) {
         renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
       }
@@ -72,8 +88,60 @@
 
     wrap.appendChild(label);
     wrap.appendChild(sel);
-    host.appendChild(wrap);
   }
+
+  // --------- UI: Select "Año" exclusivo para burbujas ----------
+ // --------- UI: Select "Año" exclusivo para burbujas (debajo del anterior) ----------
+  function ensureYearControl(data) {
+    const wrap = document.querySelector('#BurbujasGrilla .controls-burbujas');
+    if (!wrap) return;
+
+    // si ya existe, solo sincroniza
+    let sel = wrap.querySelector('#bubbleYearSel');
+    if (sel) {
+      if (currentYear != null) sel.value = String(currentYear);
+      return;
+    }
+
+    // salto de línea para que quede ABAJO del selector anterior
+    const br = document.createElement('div');
+    br.style.flexBasis = '100%';
+    br.style.height = '0';
+    br.style.margin = '0';
+    wrap.appendChild(br);
+
+    // label + select de año
+    const label = document.createElement('label');
+    label.setAttribute('for', 'bubbleYearSel');
+    label.textContent = 'Año: ';
+
+    sel = document.createElement('select');
+    sel.id = 'bubbleYearSel';
+
+    (Array.isArray(data.years) ? data.years : []).forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      sel.appendChild(opt);
+    });
+
+    sel.addEventListener('change', () => {
+      currentYear = Number(sel.value);
+      renderGrid(currentYear, data.rows[String(currentYear)] || []);
+
+      // (opcional) sincroniza el selector global si lo usas
+      const globalYearSel = document.getElementById('yearSel');
+      if (globalYearSel) globalYearSel.value = String(currentYear);
+    });
+
+    // lo agregamos AL FINAL para que quede después del selector de orden
+    wrap.appendChild(label);
+    wrap.appendChild(sel);
+
+    // valor inicial
+    if (currentYear != null) sel.value = String(currentYear);
+  }
+
 
   // --------- Leyenda de color (satisfacción) ----------
   function drawColorLegend(svg, W, H) {
@@ -133,14 +201,11 @@
       .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
       .text('Tamaño = VIF');
 
-    // CÍRCULOS DE EJEMPLO GRANDES
     const rSmall = Math.max(24, rMin * 1.25);
     const rLarge = Math.max(44, rMax * 1.25);
-
     const cy  = 16 + rLarge;
     const gap = 90 + rLarge;
 
-    // Anillos transparentes con borde blanco
     g.append('circle').attr('cx', 0).attr('cy', cy).attr('r', rSmall)
       .attr('fill', 'none')
       .attr('stroke', '#ffffff')
@@ -260,7 +325,7 @@
 
     const delitosVals = data.map(d => d.delitos).filter(Number.isFinite);
     const dMin = d3.min(delitosVals), dMax = d3.max(delitosVals);
-    const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]); // más grueso
+    const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]);
     const ringColor = '#ffffff';
 
     // Leyendas
@@ -297,24 +362,22 @@
           .transition().duration(600)
           .attr('r', d => rScale(d.vif));
 
-        // Etiqueta: nombre de región (más grande y con halo para legibilidad)
+        // Etiqueta: nombre de región (grande con halo)
         g.append('text')
           .attr('class', 'lbl-region')
           .attr('text-anchor', 'middle')
           .attr('y', d => -rScale(d.vif) - 10)
           .attr('fill', '#ffffff')
-          .attr('stroke', '#0b1020')         // halo oscuro
+          .attr('stroke', '#0b1020')
           .attr('stroke-width', 3)
           .attr('paint-order', 'stroke')
           .attr('font-weight', 800)
           .attr('font-size', d => {
-            // más grande: mínimo 14, escala con el radio
             const f = rScale(d.vif) * 0.9;
             return Math.max(20, Math.min(36, f));
           })
           .text(d => d.region);
 
-        // (Se eliminó el bloque de texto interno 'lbl-valores')
         return g;
       });
   }
@@ -331,29 +394,38 @@
     try {
       dataset = await getData();
       await ensureScales(dataset);
-      ensureSortControl(); // crea el selector de orden
 
-      const sel = document.getElementById('yearSel');
-      if (sel && sel.options.length === 0 && Array.isArray(dataset.years)) {
+      // año inicial (si existe el global #yearSel, úsalo como preferencia)
+      const globalYearSel = document.getElementById('yearSel');
+      if (globalYearSel && globalYearSel.options.length === 0 && Array.isArray(dataset.years)) {
         dataset.years.forEach(y => {
           const opt = document.createElement('option');
           opt.value = y;
           opt.textContent = y;
-          sel.appendChild(opt);
+          globalYearSel.appendChild(opt);
         });
       }
-      const year = sel ? Number(sel.value) || dataset.years[0] : dataset.years[0];
-      currentYear = year;
+      const initialYear = globalYearSel ? Number(globalYearSel.value) || dataset.years[0] : dataset.years[0];
+      currentYear = initialYear;
 
-      renderGrid(year, dataset.rows[String(year)] || []);
+      // crea controles UI
+      ensureSortControl();
+      ensureYearControl(dataset); // <<<<<< NUEVO: selector de año para burbujas
 
-      if (sel) {
-        sel.addEventListener('change', () => {
-          currentYear = Number(sel.value);
-          renderGrid(currentYear, dataset.rows[sel.value] || []);
+      // sincroniza ambos selects cuando cambie el global
+      if (globalYearSel) {
+        globalYearSel.addEventListener('change', () => {
+          currentYear = Number(globalYearSel.value);
+          const bubbleYearSel = document.getElementById('bubbleYearSel');
+          if (bubbleYearSel) bubbleYearSel.value = String(currentYear);
+          renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
         });
       }
 
+      // primer render
+      renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
+
+      // responsive
       const stageEl = document.querySelector('.panel-bubbles .stage');
       if (stageEl) {
         const ro = new ResizeObserver(() => {
@@ -363,7 +435,6 @@
         });
         ro.observe(stageEl);
       }
-
       window.addEventListener('resize', () => {
         if (currentYear != null) {
           renderGrid(currentYear, dataset.rows[String(currentYear)] || []);

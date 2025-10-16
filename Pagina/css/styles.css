@@ -531,3 +531,43 @@ body{ padding-top:80px; } /* compensa topbar */
   font-size: clamp(18px, 2vw, 24px);
   font-weight: 700;
 }
+
+
+/* ====== MOTIVACIÓN: 3 arriba, 2 abajo centradas ====== */
+#motivacion .tips{
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;   /* centra la segunda fila con 2 items */
+  gap: 24px !important;
+}
+
+/* ancho base de cada tarjeta */
+#motivacion .tip{
+  flex: 1 1 320px !important;   /* base ~320px, permite wrap limpio */
+  max-width: 420px !important;
+}
+
+/* En pantallas anchas: exactamente 3 por fila */
+@media (min-width: 1100px){
+  #motivacion .tip{
+    /* 3 columnas exactas considerando 2 gaps de 24px */
+    flex: 0 0 calc((100% - 48px) / 3) !important;
+  }
+}
+
+/* ====== Mensaje final: blanco + súper glow rosado ====== */
+#motivacion .cta-text{
+  color: #fff !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.35px;
+  text-align: center;
+  /* brillo fuerte en capas (fluor) */
+  text-shadow:
+    0 0 10px var(--pinkGlow),
+    0 0 18px var(--pinkGlow),
+    0 0 36px rgba(255, 63, 142, .55),
+    0 0 64px rgba(255, 63, 142, .45);
+  -webkit-text-stroke: 0.5px rgba(255,63,142,.28); /* leve borde rosado */
+  /* un poco más grande para llamar la atención */
+  font-size: clamp(44px, 4.6vw, 62px) !important;
+}
