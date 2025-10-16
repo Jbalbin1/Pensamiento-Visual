@@ -232,7 +232,7 @@ body{ padding-top:80px; } /* compensa topbar */
 .bullets li{ margin:4px 0; }
 
 /* ====== BURBUJAS ====== */
-#BurbujasGrilla + .stage{ height:700px; } /* como tenías */
+#BurbujasGrilla + .stage{ height:900px; } /* como tenías */
 .panel-bubbles .stage{ display:block; width:100%; }
 
 /* ====== GRID: comportamiento al abrir/cerrar detalle ====== */
@@ -593,4 +593,10 @@ body{ padding-top:80px; } /* compensa topbar */
 .help-message.hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+/* Nombres de región sobre las burbujas */
+.lbl-region {
+  font-size: 20px !important;      /* ← más chica */
+  transform: translateY(-8px);     /* ← la aleja un poquito de la burbuja */
 }
