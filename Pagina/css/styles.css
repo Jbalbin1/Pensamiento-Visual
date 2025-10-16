@@ -388,3 +388,146 @@ body{ padding-top:80px; } /* compensa topbar */
 
 
 
+/* ====== Burbujas: control de orden (grande) ====== */
+#BurbujasGrilla .controls{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin:10px 18px 0;
+}
+
+#BurbujasGrilla .controls label{
+  font-size:30px;           /* más grande */
+  font-weight:700;          /* más marcado */
+  color:#e5ebff;
+  letter-spacing:.2px;
+}
+
+#BurbujasGrilla .controls select{
+  font-size:28px;           /* más grande */
+  padding:12px 18px;        /* más alto/ancho */
+  border-radius:12px;
+  border:2px solid #3b4a7a; /* mismo estilo que tus selects */
+  background:#1b2547;
+  color:var(--ink);
+  cursor:pointer;
+  transition:.2s;
+}
+
+#BurbujasGrilla .controls select:hover{
+  background:#243566;
+}
+
+
+/* =========================
+   INICIO — tamaños XL
+   ========================= */
+#inicio.section.hero{
+  padding: 140px 8vw 80px;                    /* más aire */
+}
+#inicio .hero-content{
+  width: min(1400px, 94vw);                   /* contenedor más ancho */
+}
+
+.hero-layer h1{
+  font-size: clamp(72px, 9vw, 140px);         /* TÍTULO gigante */
+  line-height: 1.03;
+  margin-bottom: 28px;
+}
+
+.hero-layer p{
+  font-size: clamp(22px, 2.6vw, 28px);        /* párrafos más grandes */
+  line-height: 1.8;
+}
+
+/* “¿Qué es la satisfacción…?” */
+#inicio h2{
+  font-size: clamp(48px, 5vw, 72px);          /* subtítulo bien grande */
+  margin-top: 28px;
+}
+
+/* Cajas rosadas (las dos frases) más grandes */
+.hero .layer2 p,
+.hero .layer3 p{
+  padding: 24px 28px;                         /* más padding */
+  max-width: 1100px;                          /* caja más ancha */
+  font-size: clamp(22px, 2.6vw, 28px);
+}
+
+/* =========================
+   MOTIVACIÓN — tamaños XL
+   ========================= */
+#motivacion{
+  padding-top: 160px;
+  padding-bottom: 160px;
+}
+#motivacion .container{
+  width: min(1300px, 94vw);                   /* área más ancha */
+}
+
+#motivacion h2{
+  font-size: clamp(72px, 7vw, 110px);         /* título gigante */
+  line-height: 1.06;
+  margin-bottom: 56px;
+}
+
+/* Tarjetas más grandes y con más aire */
+#motivacion .tips{
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  justify-items: center;
+}
+#motivacion .tip{
+  padding: 28px 28px;
+  max-width: 420px;                            /* tarjeta más ancha */
+}
+#motivacion .tip h3{
+  font-size: clamp(28px, 3vw, 36px);
+  line-height: 1.22;
+}
+#motivacion .tip p{
+  font-size: clamp(20px, 2.2vw, 24px);
+  line-height: 1.65;
+}
+
+/* Llamado a la acción más grande */
+#motivacion .cta-text{
+  font-size: clamp(40px, 4vw, 56px);
+  margin-top: 68px;
+}
+
+/* =========================
+   Ajuste opcional móvil
+   (para que no se pase en pantallas chicas)
+   ========================= */
+@media (max-width: 520px){
+  .hero-layer h1{ font-size: clamp(56px, 11vw, 120px); }
+  #motivacion h2{ font-size: clamp(56px, 10vw, 90px); }
+}
+
+/* ====== Barra "Delitos, Violencia Intra Familiar y Satisfacción" ====== */
+#DelitosVIFSatisfacción{
+  font-size: unset;            /* anulamos 15px heredados */
+  padding: 16px 20px;          /* un poco más alta */
+  gap: 18px;
+}
+
+#DelitosVIFSatisfacción h1{
+  font-size: clamp(25px, 3.2vw, 30px);  /* TÍTULO más grande */
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Select del año (el "botón" a la derecha) */
+#DelitosVIFSatisfacción .controls select{
+  font-size: clamp(18px, 2.2vw, 26px);  /* letra grande */
+  padding: 14px 20px;                   /* más alto/ancho */
+  border-radius: 12px;
+  border-width: 2px;
+}
+
+/* (si usas label visible ahí) */
+#DelitosVIFSatisfacción .controls label{
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 700;
+}
