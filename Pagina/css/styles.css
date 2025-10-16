@@ -571,3 +571,26 @@ body{ padding-top:80px; } /* compensa topbar */
   /* un poco más grande para llamar la atención */
   font-size: clamp(44px, 4.6vw, 62px) !important;
 }
+
+/* Mensaje fijo al lado del mapa */
+.help-message {
+  position: absolute;
+  top: 2050px;
+  right: 110px;          /* a la derecha del mapa */
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, var(--pink1), var(--pink2));
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px var(--pinkGlow);
+  z-index: 10;
+  transition: opacity .4s ease;
+}
+
+.help-message.hidden {
+  opacity: 0;
+  pointer-events: none;
+}

@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 </head>
+
 <body>
   <!-- Header compartido -->
   <div id="header-placeholder"></div>
@@ -43,7 +44,7 @@
           // ordena por intersección y escoge la más visible
           const visible = entries
             .filter(e => e.isIntersecting)
-            .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
           if (visible) setActive(visible.target.id);
         }, { rootMargin: '-20% 0px -60% 0px', threshold: [0.25, 0.6, 0.9] });
 
@@ -59,49 +60,51 @@
       });
   </script>
 
-<section id="inicio" class="section hero hero-v3">
-  <div class="hero-bg">
-    <img src="img/calle-nocturna-chile.jpg" alt="Calle chilena de noche, una ventana prendida">
-    <div class="hero-overlay"></div>
-  </div>
-
-  <div class="hero-content">
-    <div class="hero-layer layer1">
-      <h1>
-        Explora,<br>
-        cuestionate,<br>
-        Conversa.<br>
-        <span class="highlight">Informarte es ayudar.</span>
-      </h1>
+  <section id="inicio" class="section hero hero-v3">
+    <div class="hero-bg">
+      <img src="img/calle-nocturna-chile.jpg" alt="Calle chilena de noche, una ventana prendida">
+      <div class="hero-overlay"></div>
     </div>
 
-    <div class="hero-layer layer2">
-      <p>Muchos percibimos los problemas sociales como algo ajeno o inevitable,<br>
-      pero el cambio <strong>está en cada uno</strong>.</p>
-    </div>
+    <div class="hero-content">
+      <div class="hero-layer layer1">
+        <h1>
+          Explora,<br>
+          cuestionate,<br>
+          Conversa.<br>
+          <span class="highlight">Informarte es ayudar.</span>
+        </h1>
+      </div>
 
-    <div class="hero-layer layer3">
-      <p>Queremos que entiendas, te cuestiones y converses
-      para así tener una ciudadanía <strong>más consciente y empática</strong>.</p>
-    </div>
+      <div class="hero-layer layer2">
+        <p>Muchos percibimos los problemas sociales como algo ajeno o inevitable,<br>
+          pero el cambio <strong>está en cada uno</strong>.</p>
+      </div>
 
-    <div class="hero-layer layer4">
-      <h2>
-        <strong>¿Qué es la satisfacción de la vida?</strong><br> </h2>
-      <p>Es cómo <strong>cada uno</strong> valora su existencia <strong>en el momento</strong>,
-      mirando la <br> 
-      <strong>salud, seguridad, felicidad</strong>.</p>
-    </div>
-  </div>
-</section>
+      <div class="hero-layer layer3">
+        <p>Queremos que entiendas, te cuestiones y converses
+          para así tener una ciudadanía <strong>más consciente y empática</strong>.</p>
+      </div>
 
-    <div id="DelitosVIFSatisfacción">
-      <h1>Delitos, Violencia Intra Familiar  y Satisfacción:</h1>
-      <div class="controls">
-        <label for="yearSel"></label>
-        <select id="yearSel"></select>
+      <div class="hero-layer layer4">
+        <h2>
+          <strong>¿Qué es la satisfacción de la vida?</strong><br>
+        </h2>
+        <p>Es cómo <strong>cada uno</strong> valora su existencia <strong>en el momento</strong>,
+          mirando la <br>
+          <strong>salud, seguridad, felicidad</strong>.
+        </p>
       </div>
     </div>
+  </section>
+
+  <div id="DelitosVIFSatisfacción">
+    <h1>Delitos, Violencia Intra Familiar y Satisfacción:</h1>
+    <div class="controls">
+      <label for="yearSel"></label>
+      <select id="yearSel"></select>
+    </div>
+  </div>
   <main class="grid" id="stats">
 
 
@@ -115,6 +118,10 @@
         <svg id="mapSvg" viewBox="0 0 700 1000" preserveAspectRatio="xMidYMid meet">
           <g id="mapGroup"></g>
         </svg>
+        <!-- Mensaje fijo al lado del mapa -->
+        <div id="helpMessage" class="help-message">
+          👆 Haz clic en alguna región para acceder a más información
+        </div>
       </div>
 
       <!-- MODO COMPARAR (2 mapas) -->
@@ -188,7 +195,7 @@
       </div>
     </section>
 
-        <!-- === PANEL BURBUJAS POR REGIÓN (NUEVO) === -->
+    <!-- === PANEL BURBUJAS POR REGIÓN (NUEVO) === -->
     <section class="panel panel-bubbles">
       <div id="BurbujasGrilla">
         <h2>Burbujas por región</h2>
@@ -210,43 +217,45 @@
 
   </main>
 
-<section id="motivacion" class="section motivation">
-  <div class="container">
-    <h2>¿Qué puedo hacer como individuo?</h2>
+  <section id="motivacion" class="section motivation">
+    <div class="container">
+      <h2>¿Qué puedo hacer como individuo?</h2>
 
-    <div class="tips tips-big">
-      <div class="tip">
-        <h3>1) Habla del tema</h3>
-        <p>Conversar de de la Violencia Intra Familiar y delitos <strong>rompe el silencio</strong> y ayuda a ver señales a tiempo.</p>
+      <div class="tips tips-big">
+        <div class="tip">
+          <h3>1) Habla del tema</h3>
+          <p>Conversar de de la Violencia Intra Familiar y delitos <strong>rompe el silencio</strong> y ayuda a ver
+            señales a tiempo.</p>
+        </div>
+        <div class="tip">
+          <h3>2) Arma red</h3>
+          <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>3) Participa</h3>
+          <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>4) Respeto siempre</h3>
+          <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
+        </div>
+        <div class="tip">
+          <h3>5) Denuncia responsable</h3>
+          <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
+        </div>
       </div>
-      <div class="tip">
-        <h3>2) Arma red</h3>
-        <p>Escucha sin juzgar, comparte información de ayuda y acompaña. <strong>No estás sol@.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>3) Participa</h3>
-        <p>Centro de estudiantes, juntas, campañas locales. <strong>Pequeñas acciones = grandes cambios.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>4) Respeto siempre</h3>
-        <p>Límites sanos, empatía, cero tolerancia a la violencia. <strong>Parte por tu círculo.</strong></p>
-      </div>
-      <div class="tip">
-        <h3>5) Denuncia responsable</h3>
-        <p>Si hay riesgo, <strong>busca apoyo adulto</strong>, autoridades o líneas de ayuda.</p>
+
+      <div class="cta-row">
+        <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
       </div>
     </div>
-
-    <div class="cta-row">
-      <p class="cta-text">La información es poder cuando se vuelve <strong>acción</strong>.</p>
-    </div>
-  </div>
-</section>
+  </section>
 
   <script src="js/bubbles.js"></script>
   <script src="js/map.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/burbujas.js"></script> 
+  <script src="js/burbujas.js"></script>
 
 </body>
+
 </html>
