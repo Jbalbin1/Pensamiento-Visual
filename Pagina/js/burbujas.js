@@ -378,6 +378,24 @@
           })
           .text(d => d.region);
 
+        // ===== HOVER (mouse encima) =====
+        g.on('mouseenter', function () {
+          d3.select(this)
+            .select('.bubble-core')     // el círculo de color
+            .transition().duration(200)
+            .attr('r', d => rScale(d.vif) * 1.15)   // crece 15 %
+            .attr('stroke-width', 4)                // borde más grueso
+            .attr('stroke', '#ffffff');             // blanco brillante
+        })
+          .on('mouseleave', function () {
+            d3.select(this)
+              .select('.bubble-core')
+              .transition().duration(200)
+              .attr('r', d => rScale(d.vif))          // vuelve al tamaño original
+              .attr('stroke-width', 1.5);             // borde finito de nuevo
+          })
+          .style('cursor', 'pointer');                // manita al pasar
+
         // ===== CLIC EN BURBUJA =====
         g.on('click', function (event, d) {
           // 1. Mostramos el cuadro
