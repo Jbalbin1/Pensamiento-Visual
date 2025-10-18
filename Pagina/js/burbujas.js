@@ -17,12 +17,12 @@
     if (!window.ScalesBurbujas) window.ScalesBurbujas = {};
 
     // Colores vivos: rosado -> violeta -> cian (bajo -> medio -> alto)
-    const css     = getComputedStyle(document.documentElement);
-    const cPink   = (css.getPropertyValue('--pink2') || '#ff3f8e').trim();
+    const css = getComputedStyle(document.documentElement);
+    const cPink = (css.getPropertyValue('--pink2') || '#ff3f8e').trim();
     const cViolet = '#8a6bff';
-    const cCyan   = '#21c4ff';
+    const cCyan = '#21c4ff';
 
-    const all  = Object.values(data.rows).flat();
+    const all = Object.values(data.rows).flat();
     const sats = all.map(d => d.satisfaccion).filter(Number.isFinite);
     const minSat = Math.min(...sats), maxSat = Math.max(...sats);
     const domain = [Math.floor(minSat), Math.ceil(maxSat)];
@@ -91,7 +91,7 @@
   }
 
   // --------- UI: Select "Año" exclusivo para burbujas ----------
- // --------- UI: Select "Año" exclusivo para burbujas (debajo del anterior) ----------
+  // --------- UI: Select "Año" exclusivo para burbujas (debajo del anterior) ----------
   function ensureYearControl(data) {
     const wrap = document.querySelector('#BurbujasGrilla .controls-burbujas');
     if (!wrap) return;
@@ -146,7 +146,7 @@
   // --------- Leyenda de color (satisfacción) ----------
   function drawColorLegend(svg, W, H) {
     svg.select('#gridLegendColor').remove();
-    const color  = window.ScalesBurbujas?.color;
+    const color = window.ScalesBurbujas?.color;
     const domain = window.ScalesBurbujas?.satDomain || [70, 85];
     if (!color) return { xEnd: 0 };
 
@@ -203,7 +203,7 @@
 
     const rSmall = Math.max(24, rMin * 1.25);
     const rLarge = Math.max(44, rMax * 1.25);
-    const cy  = 16 + rLarge;
+    const cy = 16 + rLarge;
     const gap = 90 + rLarge;
 
     g.append('circle').attr('cx', 0).attr('cy', cy).attr('r', rSmall)
@@ -311,10 +311,10 @@
 
     const realW = padX * 2 + (cols - 1) * (cellW + gapX) + cellW;
     const legendH = 90;
-    const realH = padY*2 + (rowsCount-1)*(cellH+gapY) + cellH + legendH;
+    const realH = padY * 2 + (rowsCount - 1) * (cellH + gapY) + cellH + legendH;
 
     svg.attr('viewBox', `0 0 ${realW} ${realH}`)
-       .attr('preserveAspectRatio', 'xMidYMid meet');
+      .attr('preserveAspectRatio', 'xMidYMid meet');
 
     // Escalas de tamaño (VIF) y borde (DELITOS)
     const vifs = data.map(d => d.vif).filter(Number.isFinite);
@@ -330,7 +330,7 @@
 
     // Leyendas
     const { xEnd: colorEnd } = drawColorLegend(svg, realW, realH - legendH + 20);
-    const { xEnd: sizeEnd  } = drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, colorEnd);
+    const { xEnd: sizeEnd } = drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, colorEnd);
     drawDelitosLegend(svg, realW, realH - legendH + 20, dMin, dMax, sizeEnd, ringColor);
 
     // Celdas
@@ -377,6 +377,29 @@
             return Math.max(20, Math.min(36, f));
           })
           .text(d => d.region);
+
+        // ===== CLIC EN BURBUJA =====
+        g.on('click', function (event, d) {
+          // 1. Mostramos el cuadro
+          const box = document.getElementById('detailBoxBurbujas');
+          const title = document.getElementById('detailTitleBurbujas');
+          const text = document.getElementById('detailTextBurbujas');
+
+          box.removeAttribute('hidden');
+
+          // 2. Rellenamos los datos
+          title.textContent = d.region;
+          text.innerHTML = `
+    <strong>Satisfacción de la vida:</strong> ${d.satisfaccion.toFixed(1)} %<br>
+    <strong>Violencia intrafamiliar:</strong> ${(d.vif * 100).toFixed(1)} %<br>
+    <strong>Delitos:</strong> ${(d.delitos * 100).toFixed(1)} %
+  `;
+
+          // 3. Cerrar al hacer clic en el botón
+          document.getElementById('closeDetailBurbujas').onclick = () => {
+            box.setAttribute('hidden', '');
+          };
+        });
 
         return g;
       });
