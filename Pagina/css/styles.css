@@ -600,3 +600,29 @@ body{ padding-top:80px; } /* compensa topbar */
   font-size: 20px !important;      /* ← más chica */
   transform: translateY(-8px);     /* ← la aleja un poquito de la burbuja */
 }
+
+/* Contenedor flexible: mini-burbuja + detalle */
+#BurbujasGrilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 14px 18px 0;
+}
+
+/* Mini-burbuja (la región clickeada) */
+#miniBubble {
+  flex: 0 0 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 20px var(--pinkGlow);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 22px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.1;
+}

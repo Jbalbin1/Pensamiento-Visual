@@ -387,7 +387,7 @@
 
           box.removeAttribute('hidden');
 
-          // 2. Rellenamos los datos
+          // 2. Rellenamos los datos (usamos los valores crudos del JSON)
           title.textContent = d.region;
           text.innerHTML = `
     <strong>Satisfacción de la vida:</strong> ${d.satisfaccion.toFixed(1)} %<br>
@@ -395,9 +395,20 @@
     <strong>Delitos:</strong> ${(d.delitos * 100).toFixed(1)} %
   `;
 
-          // 3. Cerrar al hacer clic en el botón
+          // 3. Mini-burbuja con el color de satisfacción
+          let mini = document.getElementById('miniBubble');
+          if (!mini) {
+            mini = document.createElement('div');
+            mini.id = 'miniBubble';
+            document.getElementById('BurbujasGrilla').insertBefore(mini, box);
+          }
+          mini.textContent = d.region;
+          mini.style.background = window.ScalesBurbujas.color(d.satisfaccion);
+
+          // 4. Cerrar al hacer clic en el botón
           document.getElementById('closeDetailBurbujas').onclick = () => {
             box.setAttribute('hidden', '');
+            mini.remove();
           };
         });
 
