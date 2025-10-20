@@ -15,12 +15,19 @@
   let currentSort = 'sat'; // 'sat' | 'vif' | 'del'
   let dataset = null;      // guardamos la data para re-render
 
-  // ===== Formateador chileno: 12,3 % =====
+  // ===== Formateador chileno: 12,34 % =====
   const nfPctES = new Intl.NumberFormat('es-CL', {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   });
-  const fmtPct = x => Number.isFinite(x) ? nfPctES.format(x * 100) + ' %' : '—';
+  // Acepta valores en fracción (0.008) o ya en porcentaje (0.80)
+  const fmtPct = x => {
+    if (!Number.isFinite(x)) return '—';
+    const val = (x > 1 ? x : x * 100);
+    return nfPctES.format(val) + ' %';
+  };
+  // VIF: ya viene en porcentaje (0.80 => 0.80 %)
+  const fmtPctVIF = x => Number.isFinite(x) ? nfPctES.format(x) + ' %' : '—';
 
   // ===== Tooltip flotante para las burbujas (hover) =====
   function ensureBubbleTooltip() {
@@ -262,7 +269,7 @@
     // Texto en DOS LÍNEAS para la burbuja chica
     const smallLabel = g.append('text')
       .attr('x', rSmall + 14)
-      .attr('y', cy - 2)                  // alineación vertical suave
+      .attr('y', cy - 2)
       .attr('fill', '#cbd6ff')
       .attr('font-size', 18);
 
@@ -271,8 +278,8 @@
       .text('Región con menor');
     smallLabel.append('tspan')
       .attr('x', rSmall + 14)
-      .attr('dy', 20)                     // segunda línea
-      .text(`Violencia Intra familiar (${fmtPct(vMin)})`);
+      .attr('dy', 20)
+      .text(`Violencia Intra familiar (${fmtPctVIF(vMin)})`);
 
     // Burbuja grande
     const x2 = gap + rLarge * 2;
@@ -294,49 +301,44 @@
     largeLabel.append('tspan')
       .attr('x', x2 + rLarge + 14)
       .attr('dy', 20)
-      .text(`Violencia Intra familiar (${fmtPct(vMax)})`);
+      .text(`Violencia Intra familiar (${fmtPctVIF(vMax)})`);
 
     const approxWidth = x2 + rLarge + 200;
     return { xEnd: x + approxWidth };
   }
 
-
-// --------- Leyenda de DELITOS (borde = grosor) ----------
+  // --------- Leyenda de DELITOS (borde = grosor) ----------
   function drawDelitosLegend(svg, W, H, dMin, dMax, xStartRightOfSize, ringColor) {
     svg.select('#gridLegendDelitos').remove();
     const EXTRA_GAP_DELITOS = 120;
-    const x = xStartRightOfSize + LEGEND_GAP_X + EXTRA_GAP_DELITOS;; y = H - 10; // más abajo (más lejos de burbujas)
+    const x = xStartRightOfSize + LEGEND_GAP_X + EXTRA_GAP_DELITOS; y = H - 10;
     const g = svg.append('g')
       .attr('id', 'gridLegendDelitos')
       .attr('transform', `translate(${x},${y})`);
 
     g.append('text').attr('x', 0).attr('y', -16)
-      .attr('fill', '#cbd6ff').attr('font-size', 32)   // título grande
+      .attr('fill', '#cbd6ff').attr('font-size', 32)
       .attr('font-weight', 900)
       .text('Borde = Delitos');
 
-    // círculos de muestra
-    const r = 70;                 // tamaño grande
-    const cy = 16 + r;            // centro en Y
+    const r = 70;
+    const cy = 16 + r;
     const gap = 180;
 
     const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]);
 
-    // Círculo "menor"
     g.append('circle')
       .attr('cx', 0).attr('cy', cy).attr('r', r)
       .attr('fill', 'none')
       .attr('stroke', ringColor)
       .attr('stroke-width', strokeScale(dMin));
 
-    // Texto debajo del círculo menor
     g.append('text')
-      .attr('x', 0).attr('y', cy + r + 22)      // ↓ debajo del borde
-      .attr('text-anchor', 'middle')            // centrado bajo el círculo
+      .attr('x', 0).attr('y', cy + r + 22)
+      .attr('text-anchor', 'middle')
       .attr('fill', '#cbd6ff').attr('font-size', 18)
       .text('Menor cantidad de delitos');
 
-    // Círculo "mayor"
     const x2 = gap + r * 2;
     g.append('circle')
       .attr('cx', x2).attr('cy', cy).attr('r', r)
@@ -344,24 +346,21 @@
       .attr('stroke', ringColor)
       .attr('stroke-width', strokeScale(dMax));
 
-    // Texto debajo del círculo mayor
     g.append('text')
-      .attr('x', x2).attr('y', cy + r + 22)     // ↓ debajo del borde
-      .attr('text-anchor', 'middle')            // centrado bajo el círculo
+      .attr('x', x2).attr('y', cy + r + 22)
+      .attr('text-anchor', 'middle')
       .attr('fill', '#cbd6ff').attr('font-size', 18)
       .text('Mayor cantidad de delitos');
   }
 
-
   // --------- Render de la grilla ----------
   function renderGrid(year, rows) {
-  if (isCompareMode()) {
-    d3.select('#gridSvg').selectAll('*').remove();  // limpia el SVG
-    return;
-  }
+    if (isCompareMode()) {
+      d3.select('#gridSvg').selectAll('*').remove();
+      return;
+    }
     svg.selectAll('g.grid-root').remove();
 
-    // ORDEN dinámico según currentSort
     const data = [...rows].sort((a, b) => {
       if (currentSort === 'vif') return d3.descending(a.vif, b.vif);
       if (currentSort === 'del') return d3.descending(a.delitos, b.delitos);
@@ -392,7 +391,7 @@
     for (let i = 0; i < data.length; i++) {
       const row = Math.floor(i / cols);
       const col = i % cols;
-      const colIndex = col; // serpenteo
+      const colIndex = col;
       const x = padX + colIndex * (cellW + gapX) + cellW / 2;
       const y = padY + row * (cellH + gapY) + cellH / 2;
       centers.push([x, y]);
@@ -400,8 +399,7 @@
 
     const realW = padX * 2 + (cols - 1) * (cellW + gapX) + cellW;
 
-    // ↑ Reservamos MÁS espacio para leyendas para separarlas de las burbujas
-    const legendH = 180; // antes 140
+    const legendH = 180;
     const realH = padY * 2 + (rowsCount - 1) * (cellH + gapY) + cellH + legendH;
 
     svg.attr('viewBox', `0 0 ${realW} ${realH}`)
@@ -419,15 +417,12 @@
     const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]);
     const ringColor = '#ffffff';
 
-    // Leyendas (las dibujamos más abajo con títulos grandes)
     const { xEnd: colorEnd } = drawColorLegend(svg, realW, realH - legendH + 20);
     const { xEnd: sizeEnd  } = drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, colorEnd);
     drawDelitosLegend(svg, realW, realH - legendH + 20, dMin, dMax, sizeEnd, ringColor);
 
-    // Tooltip (una sola instancia para todas las celdas)
     const tip = ensureBubbleTooltip();
 
-    // Celdas
     const gRoot = svg.append('g').attr('class', 'grid-root');
     gRoot.selectAll('g.cell')
       .data(data, d => d.region)
@@ -436,7 +431,6 @@
           .attr('class', 'cell')
           .attr('transform', (_, i) => `translate(${centers[i][0]},${centers[i][1]})`);
 
-        // Núcleo (relleno = satisfacción) con contorno oscuro fino
         g.append('circle')
           .attr('class', 'bubble-core')
           .attr('r', 0)
@@ -446,7 +440,6 @@
           .transition().duration(600)
           .attr('r', d => rScale(d.vif));
 
-        // Anillo (solo borde) cuyo grosor = delitos
         g.append('circle')
           .attr('class', 'bubble-ring')
           .attr('r', 0)
@@ -456,8 +449,6 @@
           .transition().duration(600)
           .attr('r', d => rScale(d.vif));
 
-        // Etiqueta: nombre de región (GRANDE)
-// Etiqueta: nombre de región — FORZAR TAMAÑO GRANDE
         g.append('text')
           .attr('class', 'lbl-region')
           .attr('text-anchor', 'middle')
@@ -471,15 +462,12 @@
             const px = Math.max(56, Math.min(120, rScale(d.vif) * 2.2));
             return px;
           })
-          // ⚠️ clave: prioridad !important para pisar cualquier CSS externo
           .style('font-size', d => {
             const px = Math.max(56, Math.min(20, rScale(d.vif) * 2.2));
             return px + 'px';
           }, 'important')
           .text(d => d.region);
 
-
-        // ===== HOVER (mouse encima) + TOOLTIP pegado al cursor =====
         g.on('mouseenter', function (event, d) {
             d3.select(this).select('.bubble-core')
               .transition().duration(180)
@@ -492,7 +480,7 @@
                 ${d.region}
               </div>
               <div><strong>Satisfacción:</strong> ${d.satisfaccion.toFixed(1)} %</div>
-              <div><strong>VIF:</strong> ${fmtPct(d.vif)}</div>
+              <div><strong>VIF:</strong> ${fmtPctVIF(d.vif)}</div>
               <div><strong>Delitos:</strong> ${fmtPct(d.delitos)}</div>
             `;
             tip.style.opacity = '1';
@@ -531,7 +519,6 @@
       dataset = await getData();
       await ensureScales(dataset);
 
-      // año inicial (si existe el global #yearSel, úsalo como preferencia)
       const globalYearSel = document.getElementById('yearSel');
       if (globalYearSel && globalYearSel.options.length === 0 && Array.isArray(dataset.years)) {
         dataset.years.forEach(y => {
@@ -544,34 +531,29 @@
       const initialYear = globalYearSel ? Number(globalYearSel.value) || dataset.years[0] : dataset.years[0];
       currentYear = initialYear;
 
-      // crea controles UI
       ensureSortControl();
-      ensureYearControl(dataset); // selector de año para burbujas
+      ensureYearControl(dataset);
 
-      // sincroniza ambos selects cuando cambie el global
       if (globalYearSel) {
         globalYearSel.addEventListener('change', () => {
           const bubblesPanel = document.querySelector('.panel-bubbles');
 
           if (globalYearSel.value === 'compare') {
-            // ocultar panel completo en comparar y limpiar svg
             bubblesPanel?.setAttribute('hidden', '');
             svg.selectAll('*').remove();
-            return; // no seguimos renderizando
+            return;
           }
           bubblesPanel?.removeAttribute('hidden');
 
-            currentYear = Number(globalYearSel.value);
-            const bubbleYearSel = document.getElementById('bubbleYearSel');
-            if (bubbleYearSel) bubbleYearSel.value = String(currentYear);
-            renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
-          });
-}
+          currentYear = Number(globalYearSel.value);
+          const bubbleYearSel = document.getElementById('bubbleYearSel');
+          if (bubbleYearSel) bubbleYearSel.value = String(currentYear);
+          renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
+        });
+      }
 
-      // primer render
       renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
 
-      // responsive
       const stageEl = document.querySelector('.panel-bubbles .stage');
       if (stageEl) {
         const ro = new ResizeObserver(() => {
