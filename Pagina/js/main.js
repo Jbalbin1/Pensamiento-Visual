@@ -44,7 +44,10 @@
   const vifFisica = document.getElementById('vifFisica');
   const delitosUL = document.getElementById('delitosList');
   delitosUL.innerHTML = ''; (data.delitos_estudiados || []).forEach(t => { const li = document.createElement('li'); li.textContent = t; delitosUL.appendChild(li); });
-
+  const vifLabelEl = document.getElementById('vifValue')?.previousElementSibling;
+  if (vifLabelEl && vifLabelEl.matches('span')) {
+    vifLabelEl.textContent = 'Porcentaje: casas que sufren de violencia intrafamiliar';
+  }
   // === Selector de año (+ opción comparar) ===
   const yearSel = document.getElementById('yearSel');
   years.forEach(y => { const o = document.createElement('option'); o.value = String(y); o.textContent = String(y); yearSel.appendChild(o); });
@@ -127,7 +130,7 @@
   }
   function fillDetail(name, row, ranks) {
     detail.dataset.region = name;
-    titleEl.textContent = `Detalle — ${name}`;
+    titleEl.textContent = `  ${name}`;
     satValue.textContent = `${row.satisfaccion.toFixed(1)}%`;
     delValue.textContent = `${row.delitos.toFixed(2)}%`;
     vifValue.textContent = `${row.vif.toFixed(2)}%`;
@@ -173,7 +176,9 @@
     else overlay.innerHTML = '';
 
     const dAttr = sourcePathEl.getAttribute('d');
-    const fill = window.Scales.color(row.satisfaccion);
+  const [minSat, maxSat] = window.Scales.satDomain || [70, 85];
+  const fill = window.Scales.color(minSat + maxSat - row.satisfaccion); // ← igual que el mapa
+
     const stroke = getComputedStyle(sourcePathEl).stroke || '#0b1739';
 
     const flySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -188,7 +193,13 @@
 
     const sb = sourcePathEl.getBoundingClientRect();
     const tb = targetSvgEl.getBoundingClientRect();
-    const scale = Math.min((tb.width * 0.82) / sb.width, (tb.height * 0.82) / sb.height);
+    let scale = Math.min((tb.width * 0.96) / sb.width, (tb.height * 0.96) / sb.height);
+    const isValpo = /valpara/i.test(row.region);
+    if (isValpo) scale *= 1.35; 
+
+    // OPCIONAL: boost extra para Valparaíso (o cualquier región chica)
+    if (/valpara/i.test(row.region)) scale *= 1.35;
+
     const x0 = sb.left + sb.width / 2, y0 = sb.top + sb.height / 2;
     const x1 = tb.left + tb.width / 2, y1 = tb.top + tb.height / 2;
 
@@ -198,16 +209,40 @@
     flyPath.style.opacity = '0.98';
     flyPath.style.transform = start;
     requestAnimationFrame(() => { flyPath.style.transform = end; });
-
     flyPath.addEventListener('transitionend', () => {
       const d = d3.select(targetSvgEl);
+      d.selectAll('*').remove();
       const g = d.append('g');
-      g.append('path').attr('d', dAttr).attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 1);
+
+      // Path final
+      g.append('path')
+        .attr('d', dAttr)
+        .attr('fill', fill)
+        .attr('stroke', stroke)
+        .attr('stroke-width', 1.8); // un borde un pelín más firme
+
+      // Calculamos el bbox original
       const bb = sourcePathEl.getBBox();
-      const pad = Math.max(bb.width, bb.height) * 0.1;
-      d.attr('viewBox', `${bb.x - pad} ${bb.y - pad} ${bb.width + 2 * pad} ${bb.height + 2 * pad}`);
+      const cx = bb.x + bb.width / 2;
+      const cy = bb.y + bb.height / 2;
+
+      // Boost SOLO para Valparaíso en el render final
+      const isValpo = /valpara/i.test(row.region);
+      const valpoBoost = isValpo ? 1.35 : 1; // ajusta este número a gusto
+
+      // Escalamos alrededor del centro del bbox
+      g.attr('transform', `translate(${cx},${cy}) scale(${valpoBoost}) translate(${-cx},${-cy})`);
+
+      // ViewBox ajustado al tamaño escalado (menos “aire” para que se vea más grande)
+      const w2 = bb.width  * valpoBoost;
+      const h2 = bb.height * valpoBoost;
+      const pad = Math.max(w2, h2) * 0.06; // 6% de margen
+
+      d.attr('viewBox', `${cx - w2/2 - pad} ${cy - h2/2 - pad} ${w2 + 2*pad} ${h2 + 2*pad}`);
+
       overlay.remove();
     }, { once: true });
+
   }
 
 })();

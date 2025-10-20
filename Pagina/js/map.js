@@ -26,11 +26,14 @@
       svg = d3.select(svgSel);
       g   = svg.select(groupSel);
 
-      const projection = d3.geoMercator()
-        .center([-72.5, -39])
-        .scale(1200)
-        .translate([350, 500]);
-      path = d3.geoPath(projection);
+    const isCompare = (svgSel === '#mapSvgL' || svgSel === '#mapSvgR');
+
+    const projection = d3.geoMercator()
+      .center([-76.5, -39])
+      .scale(isCompare ? 800 : 1200)          // ← comparación un poco más chica
+      .translate(isCompare ? [325,350] : [350, 500]);  // ← leve ajuste de centrado
+
+    path = d3.geoPath(projection);
 
       const geo = await fetch(URL).then(r=>{
         if(!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -79,15 +82,21 @@
       svg.select('#legend').remove();
       const domain = window.Scales?.satDomain || [70,85];
       const [minSat, maxSat] = domain;
-      const legendW = 300, legendH = 12;
-      const margin = {x: 24, y: 16};
+
+      // ← detecta si es mapa de comparación (L/R) para achicar solo ahí
+      const isCompare = (svgSel === '#mapSvgL' || svgSel === '#mapSvgR');
+
+      // tamaños y posición: más chico en comparar
+      const legendW = isCompare ? 260 : 340;
+      const legendH = isCompare ? 12  : 16;
+      const margin  = { x: 20, y: (isCompare ? 56 : 64) };
 
       const legend = svg.append('g').attr('id','legend')
         .attr('transform', `translate(${margin.x},${margin.y})`);
 
       const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
       const gradId = `legendGrad-${svgSel}`;
-      defs.select(`#${gradId}`).remove();              // por si se re-dibuja
+      defs.select(`#${gradId}`).remove();
       const grad = defs.append('linearGradient')
         .attr('id', gradId)
         .attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','0%');
@@ -96,11 +105,11 @@
       const N = 40;
       for (let i=0;i<=N;i++){
         const t = i / N;
-        const val = minSat + t * (maxSat - minSat);        // valor “normal”
-        const flipped = minSat + maxSat - val;             // valor espejado
+        const val     = minSat + t * (maxSat - minSat);
+        const flipped = minSat + maxSat - val; // invertido (como el mapa)
         grad.append('stop')
           .attr('offset', `${t*100}%`)
-          .attr('stop-color', baseColor(flipped));         // ← clave: usamos flipped
+          .attr('stop-color', baseColor(flipped));
       }
 
       legend.append('rect')
@@ -110,16 +119,26 @@
         .attr('stroke','#233055').attr('stroke-width',1);
 
       const scale = d3.scaleLinear().domain(domain).range([0, legendW]);
-      const axis  = d3.axisBottom(scale).ticks(4).tickFormat(d=>d.toFixed(1)+'%');
+      const axis  = d3.axisBottom(scale)
+                      .ticks(isCompare ? 4 : 5)
+                      .tickFormat(d=>d.toFixed(1)+'%');
+
       legend.append('g')
         .attr('transform', `translate(0, ${legendH})`)
         .call(axis)
-        .selectAll('text').attr('fill','#cbd6ff');
+        .selectAll('text')
+          .attr('fill','#cbd6ff')
+          .attr('font-size', isCompare ? 12 : 14);
 
       legend.append('text')
-        .attr('x',0).attr('y',-6).attr('fill','#cbd6ff')
-        .attr('font-size',12).text('Satisfacción de la vida (%)');
+        .attr('x',0).attr('y', isCompare ? -8 : -10)
+        .attr('fill','#cbd6ff')
+        .attr('font-size', isCompare ? 13 : 16)
+        .attr('font-weight', 700)
+        .text('Satisfacción de la vida (%)');
     }
+
+
 
 
     // ----- Tooltip / hover por instancia -----

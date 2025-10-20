@@ -132,22 +132,54 @@ body{ padding-top:80px; } /* compensa topbar */
   width:100%; height:100%;
 }
 .region{ stroke:#0b1739; stroke-width:1; transition:opacity .25s, filter .25s; cursor:pointer; }
+#mapSvg, #mapSvgL, #mapSvgR{
+  width: 100%;
+  height: 100%;
+}
 .region.hover{ filter: drop-shadow(0 0 12px var(--pinkGlow)); }
 
 /* Modo comparar */
 .stage-compare{
-  display:grid; grid-template-columns:1fr 1fr; gap:14px; height:90vh; padding:8px;
+  display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:8px;
 }
 .compare-pane{ position:relative; background:transparent; }
 .map-subtitle{
-  position:absolute; top:8px; left:10px; padding:6px 10px; border-radius:10px; font-size:14px;
+  position:absolute; top:8px; left:10px; padding:6px 10px; border-radius:10px; font-size:22px;
   background:#0f1a3a; color:#e5ebff; border:1px solid #2e3f73; pointer-events:none;
 }
 #singleStage, #compareStage{ transition:opacity .25s ease; }
 #singleStage[hidden], #compareStage[hidden]{ opacity:0; }
 
-/* ====== DETALLE (POPUP LATERAL) ====== */
-.panel:first-of-type .stage{ height:90vh; } /* mapa alto */
+/* ===== Alturas separadas del BOX (contenedores) ===== */
+
+/* Modo 1 mapa (el DIV con id="singleStage", que también tiene class="stage") */
+#singleStage {
+  height: 85vh !important;   /* ajústalo a gusto (p.ej. 68–78) */
+}
+
+/* Modo comparar (el DIV con id="compareStage", class="stage-compare") */
+#compareStage.stage-compare {
+  height: 90vh !important;   /* ajústalo a gusto; era 120vh */
+}
+
+/* Los SVG SIEMPRE llenan su contenedor (no fijamos vh aquí) */
+#mapSvg, #mapSvgL, #mapSvgR {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* (opcional) evita recortes dentro del panel del mapa único */
+.panel:first-of-type { overflow: visible; }
+
+
+/* 2) El mapa conserva su altura original (no se achica con la box) */
+#mapSvg{
+  width: 100%;
+  display: block;
+}
+
+ /* mapa alto */
 .panel:first-of-type{ margin-bottom:50px; }
 
 .detail-box{
@@ -221,7 +253,7 @@ body{ padding-top:80px; } /* compensa topbar */
 /* Tarjetas dentro del detalle */
 .cards-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
 .card{ background:#1b274d; border:1px solid #2b3a6e; border-radius:12px; padding:12px 14px; }
-.card h4{ margin:0 0 8px; color:#e5ebff; font-size:20px; }
+.card h4{ margin:0 0 8px; color:#e5ebff; font-size:20px; text-align: "start";}
 .pill{
   display:flex; justify-content:space-between; align-items:center; gap:8px;
   background:#0f1a3a; border:1px solid #2b3a6e; border-radius:999px; padding:8px 12px; margin-bottom:8px;
@@ -232,7 +264,7 @@ body{ padding-top:80px; } /* compensa topbar */
 .bullets li{ margin:4px 0; }
 
 /* ====== BURBUJAS ====== */
-#BurbujasGrilla + .stage{ height:900px; } /* como tenías */
+#BurbujasGrilla + .stage{ height:1300px; } /* como tenías */
 .panel-bubbles .stage{ display:block; width:100%; }
 
 /* ====== GRID: comportamiento al abrir/cerrar detalle ====== */
@@ -626,3 +658,8 @@ body{ padding-top:80px; } /* compensa topbar */
   text-align: center;
   line-height: 1.1;
 }
+
+.panel-bubbles .stage{ height:1200px; }
+.panel.panel-bubbles{ overflow:visible; }
+/* antes: 90vh */
+

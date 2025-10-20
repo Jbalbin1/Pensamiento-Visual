@@ -2,15 +2,54 @@
 // Grilla serpenteante (2 filas, ancho completo, sin scroll)
 (function () {
   const DATA_URL = 'data/series.json';
+  const LEGEND_GAP_X = 200; 
   const svg = d3.select('#gridSvg');
   if (svg.empty()) return;
+  function isCompareMode(){
+    const sel = document.getElementById('yearSel');
+    return sel && sel.value === 'compare';
+  }
 
-  // estado
+  // ===== Estado =====
   let currentYear = null;
   let currentSort = 'sat'; // 'sat' | 'vif' | 'del'
   let dataset = null;      // guardamos la data para re-render
 
-  const fmtPct = x => Number.isFinite(x) ? Math.round(x * 100) + '%' : '—';
+  // ===== Formateador chileno: 12,3 % =====
+  const nfPctES = new Intl.NumberFormat('es-CL', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  });
+  const fmtPct = x => Number.isFinite(x) ? nfPctES.format(x * 100) + ' %' : '—';
+
+  // ===== Tooltip flotante para las burbujas (hover) =====
+  function ensureBubbleTooltip() {
+    let tip = document.getElementById('bubblesTooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'bubblesTooltip';
+      tip.className = 'bubbles-tooltip';
+      Object.assign(tip.style, {
+        position: 'fixed',             // pegado al viewport
+        zIndex: '100000',              // por encima de todo
+        pointerEvents: 'none',
+        opacity: 0,
+        visibility: 'hidden',
+        background: 'rgba(17,22,42,.95)',
+        color: '#eef3ff',
+        border: '1px solid #3b4a7a',
+        borderRadius: '12px',
+        padding: '10px 12px',
+        fontSize: '16px',
+        lineHeight: '1.35',
+        boxShadow: '0 10px 24px rgba(0,0,0,.42)',
+        transform: 'translate(0, 0)',
+        transition: 'opacity .15s ease'
+      });
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
 
   // --------- Escalas (colores para satisfacción) SOLO de burbujas ----------
   async function ensureScales(data) {
@@ -18,11 +57,11 @@
 
     // Colores vivos: rosado -> violeta -> cian (bajo -> medio -> alto)
     const css = getComputedStyle(document.documentElement);
-    const cPink = (css.getPropertyValue('--pink2') || '#ff3f8e').trim();
+    const cPink   = (css.getPropertyValue('--pink2') || '#ff3f8e').trim();
     const cViolet = '#8a6bff';
-    const cCyan = '#21c4ff';
+    const cCyan   = '#21c4ff';
 
-    const all = Object.values(data.rows).flat();
+    const all  = Object.values(data.rows).flat();
     const sats = all.map(d => d.satisfaccion).filter(Number.isFinite);
     const minSat = Math.min(...sats), maxSat = Math.max(...sats);
     const domain = [Math.floor(minSat), Math.ceil(maxSat)];
@@ -78,6 +117,14 @@
     });
 
     sel.value = currentSort;
+    // estado inicial del panel de burbujas
+    const bubblesPanel = document.querySelector('.panel-bubbles');
+    if (isCompareMode()) {
+      bubblesPanel?.setAttribute('hidden', '');
+      svg.selectAll('*').remove();
+    } else {
+      bubblesPanel?.removeAttribute('hidden');
+    }
 
     sel.addEventListener('change', () => {
       currentSort = sel.value;
@@ -90,7 +137,6 @@
     wrap.appendChild(sel);
   }
 
-  // --------- UI: Select "Año" exclusivo para burbujas ----------
   // --------- UI: Select "Año" exclusivo para burbujas (debajo del anterior) ----------
   function ensureYearControl(data) {
     const wrap = document.querySelector('#BurbujasGrilla .controls-burbujas');
@@ -142,15 +188,14 @@
     if (currentYear != null) sel.value = String(currentYear);
   }
 
-
   // --------- Leyenda de color (satisfacción) ----------
   function drawColorLegend(svg, W, H) {
     svg.select('#gridLegendColor').remove();
-    const color = window.ScalesBurbujas?.color;
+    const color  = window.ScalesBurbujas?.color;
     const domain = window.ScalesBurbujas?.satDomain || [70, 85];
     if (!color) return { xEnd: 0 };
 
-    const legendW = 560, legendH = 26, x = 70, y = H - 70;
+    const legendW = 560, legendH = 26, x = 70, y = H - 10; // ↓ más abajo (más lejos de burbujas)
     const legend = svg.append('g')
       .attr('id', 'gridLegendColor')
       .attr('transform', `translate(${x},${y})`);
@@ -182,8 +227,9 @@
       .selectAll('text').attr('fill', '#cbd6ff').attr('font-size', 18);
 
     legend.append('text')
-      .attr('x', 0).attr('y', -14)
-      .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
+      .attr('x', 0).attr('y', -16)
+      .attr('fill', '#cbd6ff').attr('font-size', 32)   // ↑ título más grande
+      .attr('font-weight', 900)
       .text('Satisfacción de la vida (%)');
 
     return { xEnd: x + legendW };
@@ -192,84 +238,127 @@
   // --------- Leyenda de tamaño (VIF) como ANILLOS ----------
   function drawSizeLegend(svg, W, H, rMin, rMax, vMin, vMax, xStartRightOfColor) {
     svg.select('#gridLegendSize').remove();
-    const x = xStartRightOfColor + 60, y = H - 70;
+    const x = xStartRightOfColor + LEGEND_GAP_X; y = H - 10; // ↓ más abajo (más lejos de burbujas)
     const g = svg.append('g')
       .attr('id', 'gridLegendSize')
       .attr('transform', `translate(${x},${y})`);
 
     g.append('text').attr('x', 0).attr('y', -16)
-      .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
+      .attr('fill', '#cbd6ff').attr('font-size', 32)   // ↑ título más grande
+      .attr('font-weight', 900)
       .text('Tamaño = VIF');
 
     const rSmall = Math.max(24, rMin * 1.25);
     const rLarge = Math.max(44, rMax * 1.25);
-    const cy = 16 + rLarge;
+    const cy  = 16 + rLarge;
     const gap = 90 + rLarge;
 
+    // Burbuja chica
     g.append('circle').attr('cx', 0).attr('cy', cy).attr('r', rSmall)
       .attr('fill', 'none')
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 2.2);
 
-    g.append('text').attr('x', rSmall + 14).attr('y', cy + 6)
-      .attr('fill', '#cbd6ff').attr('font-size', 18)
-      .text(`VIF bajo (${fmtPct(vMin)})`);
+    // Texto en DOS LÍNEAS para la burbuja chica
+    const smallLabel = g.append('text')
+      .attr('x', rSmall + 14)
+      .attr('y', cy - 2)                  // alineación vertical suave
+      .attr('fill', '#cbd6ff')
+      .attr('font-size', 18);
 
+    smallLabel.append('tspan')
+      .attr('x', rSmall + 14)
+      .text('Región con menor');
+    smallLabel.append('tspan')
+      .attr('x', rSmall + 14)
+      .attr('dy', 20)                     // segunda línea
+      .text(`Violencia Intra familiar (${fmtPct(vMin)})`);
+
+    // Burbuja grande
     const x2 = gap + rLarge * 2;
-
     g.append('circle').attr('cx', x2).attr('cy', cy).attr('r', rLarge)
       .attr('fill', 'none')
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 2.2);
 
-    g.append('text').attr('x', x2 + rLarge + 14).attr('y', cy + 6)
-      .attr('fill', '#cbd6ff').attr('font-size', 18)
-      .text(`VIF alto (${fmtPct(vMax)})`);
+    // Texto en DOS LÍNEAS para la burbuja grande
+    const largeLabel = g.append('text')
+      .attr('x', x2 + rLarge + 14)
+      .attr('y', cy - 2)
+      .attr('fill', '#cbd6ff')
+      .attr('font-size', 18);
+
+    largeLabel.append('tspan')
+      .attr('x', x2 + rLarge + 14)
+      .text('Región con mayor');
+    largeLabel.append('tspan')
+      .attr('x', x2 + rLarge + 14)
+      .attr('dy', 20)
+      .text(`Violencia Intra familiar (${fmtPct(vMax)})`);
 
     const approxWidth = x2 + rLarge + 200;
     return { xEnd: x + approxWidth };
   }
 
-  // --------- Leyenda de DELITOS (borde = grosor) ----------
+
+// --------- Leyenda de DELITOS (borde = grosor) ----------
   function drawDelitosLegend(svg, W, H, dMin, dMax, xStartRightOfSize, ringColor) {
     svg.select('#gridLegendDelitos').remove();
-    const x = xStartRightOfSize + 60, y = H - 70;
+    const EXTRA_GAP_DELITOS = 120;
+    const x = xStartRightOfSize + LEGEND_GAP_X + EXTRA_GAP_DELITOS;; y = H - 10; // más abajo (más lejos de burbujas)
     const g = svg.append('g')
       .attr('id', 'gridLegendDelitos')
       .attr('transform', `translate(${x},${y})`);
 
     g.append('text').attr('x', 0).attr('y', -16)
-      .attr('fill', '#cbd6ff').attr('font-size', 20).attr('font-weight', 700)
+      .attr('fill', '#cbd6ff').attr('font-size', 32)   // título grande
+      .attr('font-weight', 900)
       .text('Borde = Delitos');
 
-    const r = 28;
-    const cy = 16 + r;
-    const gap = 140;
+    // círculos de muestra
+    const r = 70;                 // tamaño grande
+    const cy = 16 + r;            // centro en Y
+    const gap = 180;
 
     const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]);
 
+    // Círculo "menor"
     g.append('circle')
       .attr('cx', 0).attr('cy', cy).attr('r', r)
       .attr('fill', 'none')
       .attr('stroke', ringColor)
       .attr('stroke-width', strokeScale(dMin));
-    g.append('text').attr('x', r + 14).attr('y', cy + 6)
-      .attr('fill', '#cbd6ff').attr('font-size', 18)
-      .text(`Del bajo (${fmtPct(dMin)})`);
 
+    // Texto debajo del círculo menor
+    g.append('text')
+      .attr('x', 0).attr('y', cy + r + 22)      // ↓ debajo del borde
+      .attr('text-anchor', 'middle')            // centrado bajo el círculo
+      .attr('fill', '#cbd6ff').attr('font-size', 18)
+      .text('Menor cantidad de delitos');
+
+    // Círculo "mayor"
     const x2 = gap + r * 2;
     g.append('circle')
       .attr('cx', x2).attr('cy', cy).attr('r', r)
       .attr('fill', 'none')
       .attr('stroke', ringColor)
       .attr('stroke-width', strokeScale(dMax));
-    g.append('text').attr('x', x2 + r + 14).attr('y', cy + 6)
+
+    // Texto debajo del círculo mayor
+    g.append('text')
+      .attr('x', x2).attr('y', cy + r + 22)     // ↓ debajo del borde
+      .attr('text-anchor', 'middle')            // centrado bajo el círculo
       .attr('fill', '#cbd6ff').attr('font-size', 18)
-      .text(`Del alto (${fmtPct(dMax)})`);
+      .text('Mayor cantidad de delitos');
   }
+
 
   // --------- Render de la grilla ----------
   function renderGrid(year, rows) {
+  if (isCompareMode()) {
+    d3.select('#gridSvg').selectAll('*').remove();  // limpia el SVG
+    return;
+  }
     svg.selectAll('g.grid-root').remove();
 
     // ORDEN dinámico según currentSort
@@ -303,14 +392,16 @@
     for (let i = 0; i < data.length; i++) {
       const row = Math.floor(i / cols);
       const col = i % cols;
-      const colIndex = row % 2 === 0 ? col : (cols - 1 - col); // serpenteo
+      const colIndex = col; // serpenteo
       const x = padX + colIndex * (cellW + gapX) + cellW / 2;
       const y = padY + row * (cellH + gapY) + cellH / 2;
       centers.push([x, y]);
     }
 
     const realW = padX * 2 + (cols - 1) * (cellW + gapX) + cellW;
-    const legendH = 90;
+
+    // ↑ Reservamos MÁS espacio para leyendas para separarlas de las burbujas
+    const legendH = 180; // antes 140
     const realH = padY * 2 + (rowsCount - 1) * (cellH + gapY) + cellH + legendH;
 
     svg.attr('viewBox', `0 0 ${realW} ${realH}`)
@@ -328,10 +419,13 @@
     const strokeScale = d3.scaleLinear().domain([dMin, dMax]).range([3, 10]);
     const ringColor = '#ffffff';
 
-    // Leyendas
+    // Leyendas (las dibujamos más abajo con títulos grandes)
     const { xEnd: colorEnd } = drawColorLegend(svg, realW, realH - legendH + 20);
-    const { xEnd: sizeEnd } = drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, colorEnd);
+    const { xEnd: sizeEnd  } = drawSizeLegend(svg, realW, realH - legendH + 20, rMin, rMax, vMin, vMax, colorEnd);
     drawDelitosLegend(svg, realW, realH - legendH + 20, dMin, dMax, sizeEnd, ringColor);
+
+    // Tooltip (una sola instancia para todas las celdas)
+    const tip = ensureBubbleTooltip();
 
     // Celdas
     const gRoot = svg.append('g').attr('class', 'grid-root');
@@ -362,73 +456,63 @@
           .transition().duration(600)
           .attr('r', d => rScale(d.vif));
 
-        // Etiqueta: nombre de región (grande con halo)
+        // Etiqueta: nombre de región (GRANDE)
+// Etiqueta: nombre de región — FORZAR TAMAÑO GRANDE
         g.append('text')
           .attr('class', 'lbl-region')
           .attr('text-anchor', 'middle')
-          .attr('y', d => -rScale(d.vif) - 10)
+          .attr('y', d => -rScale(d.vif) - 18)
           .attr('fill', '#ffffff')
           .attr('stroke', '#0b1020')
-          .attr('stroke-width', 3)
+          .attr('stroke-width', 5)
           .attr('paint-order', 'stroke')
-          .attr('font-weight', 800)
+          .attr('font-weight', 900)
           .attr('font-size', d => {
-            const f = rScale(d.vif) * 0.9;
-            return Math.max(20, Math.min(36, f));
+            const px = Math.max(56, Math.min(120, rScale(d.vif) * 2.2));
+            return px;
           })
+          // ⚠️ clave: prioridad !important para pisar cualquier CSS externo
+          .style('font-size', d => {
+            const px = Math.max(56, Math.min(20, rScale(d.vif) * 2.2));
+            return px + 'px';
+          }, 'important')
           .text(d => d.region);
 
-        // ===== HOVER (mouse encima) =====
-        g.on('mouseenter', function () {
-          d3.select(this)
-            .select('.bubble-core')     // el círculo de color
-            .transition().duration(200)
-            .attr('r', d => rScale(d.vif) * 1.15)   // crece 15 %
-            .attr('stroke-width', 4)                // borde más grueso
-            .attr('stroke', '#ffffff');             // blanco brillante
-        })
-          .on('mouseleave', function () {
-            d3.select(this)
-              .select('.bubble-core')
-              .transition().duration(200)
-              .attr('r', d => rScale(d.vif))          // vuelve al tamaño original
-              .attr('stroke-width', 1.5);             // borde finito de nuevo
+
+        // ===== HOVER (mouse encima) + TOOLTIP pegado al cursor =====
+        g.on('mouseenter', function (event, d) {
+            d3.select(this).select('.bubble-core')
+              .transition().duration(180)
+              .attr('r', rScale(d.vif) * 1.15)
+              .attr('stroke-width', 4)
+              .attr('stroke', '#ffffff');
+
+            tip.innerHTML = `
+              <div style="font-weight:800; font-size:18px; margin-bottom:4px;">
+                ${d.region}
+              </div>
+              <div><strong>Satisfacción:</strong> ${d.satisfaccion.toFixed(1)} %</div>
+              <div><strong>VIF:</strong> ${fmtPct(d.vif)}</div>
+              <div><strong>Delitos:</strong> ${fmtPct(d.delitos)}</div>
+            `;
+            tip.style.opacity = '1';
+            tip.style.visibility = 'visible';
+            tip.style.left = event.clientX + 'px';
+            tip.style.top  = event.clientY + 'px';
           })
-          .style('cursor', 'pointer');                // manita al pasar
-
-        // ===== CLIC EN BURBUJA =====
-        g.on('click', function (event, d) {
-          // 1. Mostramos el cuadro
-          const box = document.getElementById('detailBoxBurbujas');
-          const title = document.getElementById('detailTitleBurbujas');
-          const text = document.getElementById('detailTextBurbujas');
-
-          box.removeAttribute('hidden');
-
-          // 2. Rellenamos los datos (usamos los valores crudos del JSON)
-          title.textContent = d.region;
-          text.innerHTML = `
-    <strong>Satisfacción de la vida:</strong> ${d.satisfaccion.toFixed(1)} %<br>
-    <strong>Violencia intrafamiliar:</strong> ${(d.vif * 100).toFixed(1)} %<br>
-    <strong>Delitos:</strong> ${(d.delitos * 100).toFixed(1)} %
-  `;
-
-          // 3. Mini-burbuja con el color de satisfacción
-          let mini = document.getElementById('miniBubble');
-          if (!mini) {
-            mini = document.createElement('div');
-            mini.id = 'miniBubble';
-            document.getElementById('BurbujasGrilla').insertBefore(mini, box);
-          }
-          mini.textContent = d.region;
-          mini.style.background = window.ScalesBurbujas.color(d.satisfaccion);
-
-          // 4. Cerrar al hacer clic en el botón
-          document.getElementById('closeDetailBurbujas').onclick = () => {
-            box.setAttribute('hidden', '');
-            mini.remove();
-          };
-        });
+          .on('mousemove', function (event) {
+            tip.style.left = event.clientX + 'px';
+            tip.style.top  = event.clientY + 'px';
+          })
+          .on('mouseleave', function () {
+            d3.select(this).select('.bubble-core')
+              .transition().duration(180)
+              .attr('r', d => rScale(d.vif))
+              .attr('stroke-width', 1.5);
+            tip.style.opacity = '0';
+            tip.style.visibility = 'hidden';
+          })
+          .style('cursor', 'pointer');
 
         return g;
       });
@@ -462,17 +546,27 @@
 
       // crea controles UI
       ensureSortControl();
-      ensureYearControl(dataset); // <<<<<< NUEVO: selector de año para burbujas
+      ensureYearControl(dataset); // selector de año para burbujas
 
       // sincroniza ambos selects cuando cambie el global
       if (globalYearSel) {
         globalYearSel.addEventListener('change', () => {
-          currentYear = Number(globalYearSel.value);
-          const bubbleYearSel = document.getElementById('bubbleYearSel');
-          if (bubbleYearSel) bubbleYearSel.value = String(currentYear);
-          renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
-        });
-      }
+          const bubblesPanel = document.querySelector('.panel-bubbles');
+
+          if (globalYearSel.value === 'compare') {
+            // ocultar panel completo en comparar y limpiar svg
+            bubblesPanel?.setAttribute('hidden', '');
+            svg.selectAll('*').remove();
+            return; // no seguimos renderizando
+          }
+          bubblesPanel?.removeAttribute('hidden');
+
+            currentYear = Number(globalYearSel.value);
+            const bubbleYearSel = document.getElementById('bubbleYearSel');
+            if (bubbleYearSel) bubbleYearSel.value = String(currentYear);
+            renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
+          });
+}
 
       // primer render
       renderGrid(currentYear, dataset.rows[String(currentYear)] || []);
