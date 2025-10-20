@@ -146,6 +146,10 @@
       <div id="detailBox" class="detail-box" hidden>
         <h1 id="detailTitle">Región</h1>
 
+        <!-- --- NUEVO: Mostrar el año --- -->
+        <div id="detailYear" class="detail-year">Datos de: ...</div>
+        <!-- --- FIN NUEVO --- -->
+
         <!-- región duplicada (más pequeña) -->
         <svg id="detailRegionSvg" width="220" height="140"></svg>
 
@@ -156,18 +160,27 @@
             <div class="value" id="satValue">—</div>
             <div class="sub">Satisfacción</div>
             <div class="rank" id="satRank">—</div>
+            <!-- --- CORREGIDO: Eliminado texto descriptivo de aquí --- -->
+            <div class="description">Porcentaje de la población satisfecha con sus vidas.</div>
+
           </div>
           <div class="kpi">
             <div class="icon">🏠</div>
             <div class="value" id="vifValue">—</div>
             <div class="sub">Porcentaje de casas que sufren de violencia intrafamiliar</div>
             <div class="rank" id="vifRank">—</div>
+            <!-- --- NUEVO: Texto descriptivo para VIF --- -->
+            <div class="description">Tasa de la población afectada por Violencia Intrafamiliar.</div>
+            <!-- --- FIN NUEVO --- -->
           </div>
           <div class="kpi">
             <div class="icon">🔗</div>
             <div class="value" id="delValue">—</div>
             <div class="sub">Personas que sufren delitos de tipo menor </div>
             <div class="rank" id="delRank">—</div>
+            <!-- --- NUEVO: Texto descriptivo para Delitos --- -->
+            <div class="description">Tasa de la población afectada por delitos.</div>
+            <!-- --- FIN NUEVO --- -->
           </div>
         </div>
 
@@ -175,14 +188,14 @@
         <div class="cards-2">
           <div class="card">
             <h4>Violencia intrafamiliar</h4>
-            <div class="pill">
-              <span>Psicológica</span>
-              <strong id="vifPsico">—</strong>
+            <!-- --- NUEVO: Contenedor para el gráfico y la leyenda --- -->
+            <div class="vif-container">
+              <!-- Leyenda a la izquierda -->
+              <div id="vifLegend" class="vif-legend"></div>
+              <!-- Gráfico de torta a la derecha -->
+              <svg id="vifPieChart" width="180" height="180"></svg>
             </div>
-            <div class="pill">
-              <span>Física</span>
-              <strong id="vifFisica">—</strong>
-            </div>
+            <!-- --- FIN NUEVO --- -->
           </div>
 
           <div class="card">
@@ -191,7 +204,9 @@
           </div>
         </div>
 
-        <button id="closeDetail" class="close-detail">Cerrar</button>
+        <!-- --- MODIFICADO: Botón de cerrar más grande --- -->
+        <button id="closeDetail" class="close-detail large-button">Cerrar</button>
+        <!-- --- FIN MODIFICADO --- -->
       </div>
     </section>
 
@@ -201,25 +216,14 @@
         <h2>Burbujas por región</h2>
       </div>
 
-      <div id="detailBoxBurbujas" class="detail-box" hidden>
-        <h3 id="detailTitleBurbujas">Detalle — Región</h3>
-        <p id="detailTextBurbujas">Selecciona una burbuja para ver más información.</p>
-        <button id="closeDetailBurbujas" class="close-detail">Cerrar</button>
-      </div>
-
+      <!-- El JS busca este ID -->
       <div class="stage">
-        <!-- El JS busca este ID -->
         <svg id="gridSvg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
 
       <!-- Recuadro de detalle opcional (si lo usas para burbujas) -->
-      <div id="detailBoxBurbujas" class="detail-box" hidden>
-        <h3 id="detailTitleBurbujas">Detalle — Región</h3>
-        <p id="detailTextBurbujas">Selecciona una burbuja para ver más información.</p>
-        <button id="closeDetailBurbujas" class="close-detail">Cerrar</button>
-      </div>
+      <!-- Por ahora, solo dejamos el panel principal y el SVG. -->
     </section>
-
 
   </main>
 

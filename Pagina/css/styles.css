@@ -659,7 +659,64 @@ body{ padding-top:80px; } /* compensa topbar */
   line-height: 1.1;
 }
 
+
 .panel-bubbles .stage{ height:1200px; }
 .panel.panel-bubbles{ overflow:visible; }
 /* antes: 90vh */
+
+
+#compareStage:not([hidden]) svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* En tu styles.css */
+.close-detail.large-button {
+  font-size: 24px; /* Aumenta el tamaño de la fuente */
+  padding: 16px 28px; /* Aumenta el padding para hacerlo más grande */
+  border-radius: 16px; /* Puedes ajustar el borde redondeado */
+}
+
+/* En tu styles.css */
+.kpi .description {
+  font-size: 12px; /* Tamaño de fuente más pequeño */
+  color: #a9b7ff; /* Color más tenue, similar al de los subtítulos */
+  margin-top: 4px; /* Espacio arriba */
+  text-align: center; /* Centrado */
+}
+
+/* En tu styles.css */
+.vif-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.vif-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(17, 22, 42, 0.3); /* Fondo semi-transparente */
+  border-radius: 8px;
+  min-width: 150px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Estilo para el gráfico de torta (opcional, si quieres ajustar el fondo) */
+#vifPieChart {
+  background-color: transparent;
+}
 

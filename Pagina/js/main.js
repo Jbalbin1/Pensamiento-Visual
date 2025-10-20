@@ -40,14 +40,18 @@
   const delRank = document.getElementById('delRank');
   const closeBtn = document.getElementById('closeDetail');
   const detailSvg = d3.select('#detailRegionSvg');
-  const vifPsico = document.getElementById('vifPsico');
-  const vifFisica = document.getElementById('vifFisica');
+  const vifPsico = document.getElementById('vifPsico'); // Ya no se usará directamente
+  const vifFisica = document.getElementById('vifFisica'); // Ya no se usará directamente
   const delitosUL = document.getElementById('delitosList');
   delitosUL.innerHTML = ''; (data.delitos_estudiados || []).forEach(t => { const li = document.createElement('li'); li.textContent = t; delitosUL.appendChild(li); });
-  const vifLabelEl = document.getElementById('vifValue')?.previousElementSibling;
-  if (vifLabelEl && vifLabelEl.matches('span')) {
-    vifLabelEl.textContent = 'Porcentaje: casas que sufren de violencia intrafamiliar';
-  }
+
+  // --- NUEVO: Elemento para mostrar el año ---
+  const yearDisplay = document.getElementById('detailYear');
+
+  // --- NUEVO: Referencias al SVG del gráfico de torta y a la leyenda ---
+  const pieChartSvg = d3.select('#vifPieChart');
+  const legendContainer = document.getElementById('vifLegend');
+
   // === Selector de año (+ opción comparar) ===
   const yearSel = document.getElementById('yearSel');
   years.forEach(y => { const o = document.createElement('option'); o.value = String(y); o.textContent = String(y); yearSel.appendChild(o); });
@@ -119,26 +123,188 @@
   yearSel.addEventListener('change', refresh);
   refresh();
 
+      // Al cambiar a modo comparar forzamos un resize interno
+  yearSel.addEventListener('change', () => {
+    refresh();
+    if (yearSel.value === 'compare') {
+      // pequeño delay para que el DOM esté listo
+      setTimeout(() => {
+        ['#mapSvgL', '#mapSvgR'].forEach(sel => {
+          const svg = document.querySelector(sel);
+          if (!svg) return;
+          // fuerza re-cálculo del viewBox
+          const vb = svg.getAttribute('viewBox');
+          svg.setAttribute('viewBox', '');   // reset
+          svg.setAttribute('viewBox', vb);   // reaplica
+        });
+      }, 60);
+    }
+  });
+
   // ====== Detalle / rankings (se mantienen) ======
   function ordinal(n) { return `${n}.º lugar`; }
+
+  // --- MODIFICADO: Función computeRanks para usar la numeración oficial de Chile ---
   function computeRanks(rows) {
+    // Definimos el orden oficial de las regiones de Chile (I a XVI)
+    const officialOrder = [
+      "Arica y Parinacota",     // I
+      "Tarapacá",               // II
+      "Antofagasta",            // III
+      "Atacama",                // IV
+      "Coquimbo",               // V
+      "Valparaíso",             // VI
+      "Metropolitana",          // RM
+      "O'Higgins",              // VII
+      "Maule",                  // VIII
+      "Ñuble",                  // IX
+      "Biobío",                 // X
+      "Araucanía",              // XI
+      "Los Ríos",               // XII
+      "Los Lagos",              // XIV
+      "Aysén",                  // XV
+      "Magallanes"              // XVI
+    ];
+
+    // Creamos un objeto que asigna el número oficial a cada región
+    const regionNumber = Object.fromEntries(officialOrder.map((name, i) => [name, i + 1]));
+
     const bySat = [...rows].sort((a, b) => d3.descending(a.satisfaccion, b.satisfaccion));
     const byDel = [...rows].sort((a, b) => d3.ascending(a.delitos, b.delitos));
     const byVIF = [...rows].sort((a, b) => d3.ascending(a.vif, b.vif));
+
     const rank = arr => Object.fromEntries(arr.map((d, i) => [d.region, i + 1]));
-    return { sat: rank(bySat), del: rank(byDel), vif: rank(byVIF), total: rows.length };
+    return {
+      sat: rank(bySat),
+      del: rank(byDel),
+      vif: rank(byVIF),
+      total: rows.length,
+      number: regionNumber // <-- Nuevo: añadimos el número oficial de región
+    };
   }
+
+  // --- NUEVO: Función para dibujar el gráfico de torta ---
+  function drawVifPieChart(psico, fisica) {
+    // Limpiamos el SVG
+    pieChartSvg.selectAll('*').remove();
+
+    // Calculamos el valor de "Otros"
+    const otros = 100 - psico - fisica;
+    const data = [
+      { name: 'Psicológica', value: psico, color: '#FF6B6B' }, // Rojo vibrante (similar a los tonos rosados del título)
+      { name: 'Física', value: fisica, color: '#4ECDC4' },     // Turquesa (contraste)
+      { name: 'Otros', value: otros, color: '#95A5A6' }        // Gris claro (neutro)
+    ].filter(d => d.value > 0); // Solo incluimos categorías con valor > 0
+
+    if (data.length === 0) return; // Si no hay datos, no dibujamos nada
+
+    const width = 180, height = 180;
+    const radius = Math.min(width, height) / 2 - 20;
+
+    // Creamos el grupo centralizado
+    const g = pieChartSvg
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+    // Definimos la escala de colores
+    const colorScale = d3.scaleOrdinal()
+      .domain(data.map(d => d.name))
+      .range(data.map(d => d.color));
+
+    // Definimos el generador de arcos
+    const pie = d3.pie()
+      .value(d => d.value)
+      .sort(null);
+
+    const arc = d3.arc()
+      .innerRadius(radius * 0.6) // Para hacerlo un donut
+      .outerRadius(radius);
+
+    // Dibujamos los arcos
+    g.selectAll('path')
+      .data(pie(data))
+      .join('path')
+      .attr('d', arc)
+      .attr('fill', d => colorScale(d.data.name))
+      .attr('stroke', '#233055')
+      .attr('stroke-width', 1);
+  }
+
+  // --- NUEVO: Función para actualizar la leyenda ---
+  function updateVifLegend(psico, fisica, otros) {
+    // Limpiamos la leyenda
+    legendContainer.innerHTML = '';
+
+    // Definimos los colores (deben coincidir con los del gráfico)
+    const colors = {
+      'Psicológica': '#FF6B6B',
+      'Física': '#4ECDC4',
+      'Otros': '#95A5A6'
+    };
+
+    // Creamos los elementos de la leyenda
+    const categories = [
+      { name: 'Psicológica', value: psico },
+      { name: 'Física', value: fisica },
+      { name: 'Otros', value: otros }
+    ];
+
+    categories.forEach(cat => {
+      if (cat.value > 0) {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = colors[cat.name];
+
+        const text = document.createElement('span');
+        text.textContent = `${cat.name}: ${cat.value.toFixed(1)}%`;
+
+        item.appendChild(colorBox);
+        item.appendChild(text);
+        legendContainer.appendChild(item);
+      }
+    });
+  }
+
   function fillDetail(name, row, ranks) {
     detail.dataset.region = name;
-    titleEl.textContent = `  ${name}`;
+    // --- MODIFICADO: Formato del título con el número oficial ---
+    const regionNumber = ranks.number[name]; // Obtenemos el número oficial de región
+    titleEl.textContent = `Región (${regionNumber}): ${name}`;
+    // --- FIN MODIFICADO ---
+
+    // --- NUEVO: Mostrar el año ---
+    const currentYear = yearSel.value === 'compare' ? years[0] : yearSel.value;
+    yearDisplay.textContent = `Datos de: ${currentYear}`;
+
     satValue.textContent = `${row.satisfaccion.toFixed(1)}%`;
     delValue.textContent = `${row.delitos.toFixed(2)}%`;
     vifValue.textContent = `${row.vif.toFixed(2)}%`;
     satRank.textContent = `${ordinal(ranks.sat[name])} en satisfacción`;
     delRank.textContent = `${ordinal(ranks.del[name])} en delitos`;
     vifRank.textContent = `${ordinal(ranks.vif[name])} en VIF`;
-    if (Number.isFinite(row.vif_psicologica)) vifPsico.textContent = `${row.vif_psicologica.toFixed(1)}%`;
-    if (Number.isFinite(row.vif_fisica)) vifFisica.textContent = `${row.vif_fisica.toFixed(1)}%`;
+
+    // --- NUEVO: Actualizar los valores de VIF Psicologica y Fisica ---
+    let psicoValue = 0, fisicaValue = 0;
+    if (Number.isFinite(row.vif_psicologica)) {
+      psicoValue = row.vif_psicologica;
+    }
+    if (Number.isFinite(row.vif_fisica)) {
+      fisicaValue = row.vif_fisica;
+    }
+
+    // --- NUEVO: Calcular "Otros" ---
+    const otrosValue = 100 - psicoValue - fisicaValue;
+
+    // --- NUEVO: Dibujar el gráfico de torta ---
+    drawVifPieChart(psicoValue, fisicaValue);
+
+    // --- NUEVO: Actualizar la leyenda ---
+    updateVifLegend(psicoValue, fisicaValue, otrosValue);
   }
 
   function handleRegionClick(name, pathEl) {
@@ -176,9 +342,10 @@
     else overlay.innerHTML = '';
 
     const dAttr = sourcePathEl.getAttribute('d');
-  const [minSat, maxSat] = window.Scales.satDomain || [70, 85];
-  const fill = window.Scales.color(minSat + maxSat - row.satisfaccion); // ← igual que el mapa
-
+    // --- CORREGIDO: Aplicar inversión de color como en el mapa ---
+    const [minSat, maxSat] = window.Scales.satDomain || [70, 85];
+    const fill = window.Scales.color(minSat + maxSat - row.satisfaccion); // ← igual que el mapa
+    // --- FIN CORREGIDO ---
     const stroke = getComputedStyle(sourcePathEl).stroke || '#0b1739';
 
     const flySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -193,13 +360,28 @@
 
     const sb = sourcePathEl.getBoundingClientRect();
     const tb = targetSvgEl.getBoundingClientRect();
-    let scale = Math.min((tb.width * 0.96) / sb.width, (tb.height * 0.96) / sb.height);
-    const isValpo = /valpara/i.test(row.region);
-    if (isValpo) scale *= 1.35; 
 
-    // OPCIONAL: boost extra para Valparaíso (o cualquier región chica)
-    if (/valpara/i.test(row.region)) scale *= 1.35;
+    // --- MODIFICADO: Cálculo del scale con límites para regiones pequeñas ---
+    // Calculamos el scale ideal
+    const scaleX = (tb.width * 0.82) / sb.width;
+    const scaleY = (tb.height * 0.82) / sb.height;
+    let scale = Math.min(scaleX, scaleY);
 
+    // Establecemos un límite inferior y superior para el scale
+    // Esto evita que regiones muy pequeñas se agranden demasiado y que regiones muy grandes se reduzcan demasiado
+    const minScale = 1.0; // Mínimo: no se reduce
+    const maxScale = 8.0; // Máximo: no se agranda más de 8 veces
+
+    scale = Math.max(minScale, Math.min(maxScale, scale));
+
+    // --- NUEVO: Ajuste adicional para Valparaíso ---
+    // Aplicamos un factor de aumento específico para Valparaíso
+    if (/valpara/i.test(row.region)) {
+        scale *= 1.35; // Ajusta este número si es necesario
+    }
+    // --- FIN NUEVO ---
+
+    // Calculamos los puntos de origen y destino
     const x0 = sb.left + sb.width / 2, y0 = sb.top + sb.height / 2;
     const x1 = tb.left + tb.width / 2, y1 = tb.top + tb.height / 2;
 
@@ -209,40 +391,27 @@
     flyPath.style.opacity = '0.98';
     flyPath.style.transform = start;
     requestAnimationFrame(() => { flyPath.style.transform = end; });
+
     flyPath.addEventListener('transitionend', () => {
       const d = d3.select(targetSvgEl);
-      d.selectAll('*').remove();
+      d.selectAll('*').remove(); // Limpiar antes de dibujar
       const g = d.append('g');
 
-      // Path final
+      // Path final con grosor aumentado
       g.append('path')
         .attr('d', dAttr)
         .attr('fill', fill)
         .attr('stroke', stroke)
-        .attr('stroke-width', 1.8); // un borde un pelín más firme
+        .attr('stroke-width', 3) // Grosor aumentado para mejor visibilidad
+        .attr('fill-opacity', 0.8); // Relleno ligeramente transparente
 
       // Calculamos el bbox original
       const bb = sourcePathEl.getBBox();
-      const cx = bb.x + bb.width / 2;
-      const cy = bb.y + bb.height / 2;
-
-      // Boost SOLO para Valparaíso en el render final
-      const isValpo = /valpara/i.test(row.region);
-      const valpoBoost = isValpo ? 1.35 : 1; // ajusta este número a gusto
-
-      // Escalamos alrededor del centro del bbox
-      g.attr('transform', `translate(${cx},${cy}) scale(${valpoBoost}) translate(${-cx},${-cy})`);
-
-      // ViewBox ajustado al tamaño escalado (menos “aire” para que se vea más grande)
-      const w2 = bb.width  * valpoBoost;
-      const h2 = bb.height * valpoBoost;
-      const pad = Math.max(w2, h2) * 0.06; // 6% de margen
-
-      d.attr('viewBox', `${cx - w2/2 - pad} ${cy - h2/2 - pad} ${w2 + 2*pad} ${h2 + 2*pad}`);
-
+      // Aplicamos el padding proporcional
+      const pad = Math.max(sb.width, sb.height) * 0.15; // 15% del tamaño original
+      d.attr('viewBox', `${bb.x - pad} ${bb.y - pad} ${bb.width + 2 * pad} ${bb.height + 2 * pad}`);
       overlay.remove();
     }, { once: true });
-
   }
 
 })();
